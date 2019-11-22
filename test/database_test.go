@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	db "gitlab.com/gpctda/libcore/database"
+	db "github.com/rafael180496/libcore/database"
 )
 
 /*TestPost : Se conecta a una base de datos  postgret de configuracion*/
@@ -11,7 +11,7 @@ func TestPost(t *testing.T) {
 	var (
 		conexion db.StConect
 	)
-	path := "/home/rhidalgo/Documentos/go_projects/src/gitlab.com/gpctda/libcore/test/src/post.ini"
+	path := "/home/rhidalgo/Documentos/go_projects/src/github.com/rafael180496/libcore/test/src/post.ini"
 	t.Logf("Capturando path:%s", path)
 	err := conexion.ConfigINI(path)
 	if err != nil {
@@ -29,7 +29,7 @@ func TestORA(t *testing.T) {
 	var (
 		conexion db.StConect
 	)
-	path := "/home/rhidalgo/Documentos/go_projects/src/gitlab.com/gpctda/libcore/test/src/ora.json"
+	path := "/home/rhidalgo/Documentos/go_projects/src/github.com/rafael180496/libcore/test/src/ora.json"
 	t.Logf("Capturando path:%s", path)
 	err := conexion.ConfigJSON(path)
 	if err != nil {

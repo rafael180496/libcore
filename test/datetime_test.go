@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"gitlab.com/gpctda/libcore/utility"
+	"github.com/rafael180496/libcore/utility"
 )
 
 /*TestFNulo : Envie una fecha nula.*/

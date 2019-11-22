@@ -1,7 +1,7 @@
 package server
 
 import (
-	utl "gitlab.com/gpctda/libcore/utility"
+	utl "github.com/rafael180496/libcore/utility"
 
 	"github.com/labstack/echo"
 	"github.com/mssola/user_agent"

@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"gitlab.com/gpctda/libcore/utility"
+	"github.com/rafael180496/libcore/utility"
 )
 
 /*TestAes : prueba las funciones de encriptamiento aes */

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	utl "gitlab.com/gpctda/libcore/utility"
+	utl "github.com/rafael180496/libcore/utility"
 
 	"github.com/jmoiron/sqlx"
 )

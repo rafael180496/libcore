@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-ini/ini"
 	"github.com/jmoiron/sqlx"
-	utl "gitlab.com/gpctda/libcore/utility"
+	utl "github.com/rafael180496/libcore/utility"
 
 	/*Conexion a mysql*/
 	_ "github.com/go-sql-driver/mysql"

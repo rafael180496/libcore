@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	utl "gitlab.com/gpctda/libcore/utility"
+	utl "github.com/rafael180496/libcore/utility"
 )
 
 /*TestMsjBlue : Envie un string en color celeste*/
