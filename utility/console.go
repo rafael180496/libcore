@@ -1,0 +1,137 @@
+package utility
+
+import (
+	"fmt"
+	"runtime"
+	"strings"
+
+	color "github.com/fatih/color"
+)
+
+/*MsjPc : envia un string de color personalizado de las
+constantes disponible en la libreria */
+func MsjPc(c Pc, format string, arg ...interface{}) string {
+	var (
+		menj strings.Builder
+	)
+	if !IsLinux() {
+		fmt.Fprintf(&menj, format, arg...)
+	} else {
+		d := color.New(sendColor(c), color.Bold)
+		d.Fprintf(&menj, format, arg...)
+	}
+	return menj.String()
+}
+
+/*PrintPc : muestra un printf con color personalizado para consolas
+basadas en linux*/
+func PrintPc(c Pc, format string, arg ...interface{}) {
+	if !IsLinux() {
+		fmt.Printf(format, arg...)
+	} else {
+		d := color.New(sendColor(c), color.Bold)
+		d.Printf(format, arg...)
+
+	}
+}
+
+/*MsjBlue : Enviar un string de color celeste funciona para consolas
+basadas en linux */
+func MsjBlue(format string, arg ...interface{}) string {
+	return MsjPc(Blue, format, arg...)
+}
+
+/*MsjRed : Enviar un string de color rojo para consolas
+basadas en linux*/
+func MsjRed(format string, arg ...interface{}) string {
+	return MsjPc(Red, format, arg...)
+}
+
+/*MsjGreen : Enviar un string de color verde para consolas
+basadas en linux*/
+func MsjGreen(format string, arg ...interface{}) string {
+	return MsjPc(Green, format, arg...)
+}
+
+/*PrintGreen : muestra un printf con color verde para consolas
+basadas en linux*/
+func PrintGreen(format string, arg ...interface{}) {
+	PrintPc(Green, format, arg...)
+}
+
+/*PrintRed : muestra un printf con color rojo para consolas
+basadas en linux*/
+func PrintRed(format string, arg ...interface{}) {
+	PrintPc(Red, format, arg...)
+}
+
+/*sendColor : envia el color correcto en atributo */
+func sendColor(item Pc) color.Attribute {
+	switch item {
+	/*Green : verde */
+	case Green:
+		return color.FgGreen
+		/*Red : rojo */
+	case Red:
+		return color.FgRed
+		/*Blue : azul */
+	case Blue:
+		return color.FgBlue
+		/*Cyan : celeste */
+	case Cyan:
+		return color.FgCyan
+		/*White : blanco */
+	case White:
+		return color.FgWhite
+		/*Black : negro */
+	case Black:
+		return color.FgBlack
+		/*Yellow : amarillo*/
+	case Yellow:
+		return color.FgYellow
+		/*Magenta : magenta */
+	case Magenta:
+		return color.FgMagenta
+		/*HiBlack : negro fuerte */
+	case HBlack:
+		return color.FgHiBlack
+		/*HRed : rojo fuerte */
+	case HRed:
+		return color.FgHiRed
+		/*HGreen : verde fuerte */
+	case HGreen:
+		return color.FgHiGreen
+		/*HYellow : amarrillo fuerte */
+	case HYellow:
+		return color.FgHiYellow
+		/*HBlue : azul fuerte */
+	case HBlue:
+		return color.FgHiBlue
+		/*HMagenta : magenta fuerte*/
+	case HMagenta:
+		return color.FgHiMagenta
+		/*HCyan : celeste fuerte */
+	case HCyan:
+		return color.FgHiCyan
+		/*HWhite : blanco fuerte */
+	case HWhite:
+		return color.FgHiWhite
+	default:
+		return color.FgWhite
+
+	}
+
+}
+
+/*IsLinux : Valida si estas en un sistema operativo linux */
+func IsLinux() bool {
+	switch runtime.GOOS {
+	case "windows":
+		return false
+
+	case "linux", "darwin":
+		return true
+	default:
+		return false
+	}
+}

@@ -1,0 +1,9 @@
+{
+    "usuario": "DWHPRO",
+    "clave": "dwhpro",
+    "nombre": "XE",
+    "tipo": "ORA",
+    "host": "192.168.252.12",
+    "puerto": 1521,
+    "sslmode": ""
+}

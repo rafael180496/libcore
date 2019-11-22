@@ -1,0 +1,111 @@
+package utility
+
+type (
+	/*Pc : es un tipo para las paletas de colores.*/
+	Pc string
+)
+
+var (
+	/*SMTPURL :  Host de correos */
+	SMTPURL = map[string]string{
+		"gmail": "smtp.gmail.com:587",
+	}
+
+	/*Msj : mensajes de error en las librerias*/
+	Msj = map[string]string{
+		"GE01": "Mensaje no encontrado.",
+		//libreria encrip
+		"EN01": "Error en generar phisher.",
+		"EN02": "Error en generar bloque.",
+		"EN03": "Error en leer el bloque.",
+		"EN04": "Error en abrir el bloque.",
+		//libreria convert
+		"CO01": "Error en convertir float.",
+		"CO02": "Error en convertir int64.",
+		"CO03": "Error en convertir int32.",
+		//libreria archivo,
+		"AR01": "No existe el archivo.",
+		"AR02": "Error al crear directorio.",
+		"AR03": "Error al crear archivo.",
+		"AR04": "Error al crear log.",
+		"AR05": "No existe el directorio.",
+		//libreria database
+		"CN01": "Error al convertir a json.",
+		"CN02": "Error al convertir a string.",
+		"CN03": "Error al convertir a string.",
+		"CN04": "No tiene el insert.",
+		"CN05": "No tiene los prefijos validos.",
+		"CN06": "No se obtuvieron las columnas.",
+		"CN07": "No se obtuvieron las filas .",
+		"CN08": "Error al leer archivo config json.",
+		"CN09": "No existe el arhivo config json.",
+		"CN10": "No existe el arhivo config ini.",
+		"CN11": "Error al leer archivo config ini.",
+		"CN12": "El archivo config no es valido.",
+		"CN13": "Tipo de DB no compatible.",
+		"CN14": "Error al conectar ala DB.",
+		"CN15": "Cantidad de fila es cero.",
+		"CN16": "Error al cerrar ala DB.",
+		"CN17": "Error en commit.",
+		"CN18": "Error en al ejecutar querie.",
+		"CN19": "Error en al obtener columna.",
+		//libreria json
+		"JS01": "Error al generar un nuevo json.",
+		"JS02": "Error al convertir un json.",
+		"JS03": "Json null.",
+		"JS04": "Error al capturar json.",
+		//Libreria de Email
+		"ER01": "Error en enviar el mensaje",
+		/*libreria server */
+		"SR01": "Tipo  de peticion incorrecta.",
+		"SR02": "El Path es invalido.",
+		"SR03": "No contiene una funcion de peticion.",
+	}
+	/*EXT : extensiones de archivos */
+	EXT = map[string]string{
+		"JSON": ".json",
+		"INI":  ".ini",
+		"XML":  ".xml",
+		"RUT":  ".rut",
+		"SQL":  ".sql",
+	}
+)
+
+const (
+	/*colores disponibles */
+
+	/*Green : verde */
+	Green Pc = "g"
+	/*Red : rojo */
+	Red Pc = "r"
+	/*Blue : azul */
+	Blue Pc = "b"
+	/*Cyan : celeste */
+	Cyan Pc = "c"
+	/*White : blanco */
+	White Pc = "w"
+	/*Black : negro */
+	Black Pc = "bl"
+	/*Yellow : amarillo*/
+	Yellow Pc = "y"
+	/*Magenta : magenta */
+	Magenta Pc = "m"
+	/*HBlack : negro fuerte */
+	HBlack Pc = "hbl"
+	/*HRed : rojo fuerte */
+	HRed Pc = "hr"
+	/*HGreen : verde fuerte */
+	HGreen Pc = "hg"
+	/*HYellow : amarrillo fuerte */
+	HYellow Pc = "hy"
+	/*HBlue : azul fuerte */
+	HBlue Pc = "hb"
+	/*HMagenta : magenta fuerte*/
+	HMagenta Pc = "hm"
+	/*HCyan : celeste fuerte */
+	HCyan Pc = "hc"
+	/*HWhite : blanco fuerte */
+	HWhite Pc = "hw"
+	/*FORMFE : Formato de fecha para los archivo YYYYMMDD*/
+	FORMFE = "%d%02d%02d"
+)
