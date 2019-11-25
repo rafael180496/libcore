@@ -40,7 +40,7 @@ del **GOPATH** esto crea un entorno cerrado al proyecto.
 
 ### **Librerias Externas:**
 
-**Toda libreria externa se debe de intalar para que
+**Toda libreria externa se debe de instalar para que
 funcione correctamente el proyecto.**
 
 * [fatih/color]([https://github.com/fatih/color])
