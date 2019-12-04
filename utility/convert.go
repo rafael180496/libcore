@@ -31,6 +31,19 @@ func BytetoStrHex(str []byte) string {
 	return strByte
 }
 
+/*SliceStrToStr : convierte un array de strings a un string con separador */
+func SliceStrToStr(strs []string, separador string) string {
+	str := ""
+	for i := 0; i < len(strs); i++ {
+		if i != (len(strs) - 1) {
+			str += strs[i] + separador
+		} else {
+			str += strs[i]
+		}
+	}
+	return str
+}
+
 /*StrtoByteHex : Convierte un string a array byte */
 func StrtoByteHex(str string) []byte {
 	strByte, _ := hex.DecodeString(str)
