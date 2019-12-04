@@ -328,6 +328,8 @@ func (p *StConect) QueryStruct(datadest interface{}, query StQuery, indConect bo
 		}
 		typeext := sqlx.BindType(p.DBGO.DriverName())
 		sqltemp, args, err = sqlx.BindNamed(typeext, query.Querie, query.Args)
+		sqltemp, args, err = sqlx.In(query.Querie, args...)
+		sqltemp = p.DBGO.Rebind(sqltemp)
 		if err != nil {
 			err = utl.SendErrorCod("CN07")
 			FinChan <- true
