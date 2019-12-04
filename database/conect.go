@@ -53,6 +53,26 @@ func (p *StConect) Close() error {
 	return nil
 }
 
+/*NamedIn : procesa los argumentos y sql para agarrar la clausula IN */
+func (p *StConect) NamedIn(query StQuery) (string, []interface{}, error) {
+	var (
+		sqltemp string
+		args    []interface{}
+		err     error
+	)
+	sqltemp, args, err = sqlx.Named(query.Querie, query.Args)
+	if err != nil {
+		return "", nil, err
+	}
+	sqltemp, args, err = sqlx.In(sqltemp, args...)
+	if err != nil {
+		return "", nil, err
+	}
+	sqltemp = p.DBGO.Rebind(sqltemp)
+
+	return sqltemp, args, err
+}
+
 /*ConfigJSON : Lee las configuraciones de conexion mediante un .json
 
 Ejemplo:
@@ -326,10 +346,7 @@ func (p *StConect) QueryStruct(datadest interface{}, query StQuery, indConect bo
 			FinChan <- true
 			return
 		}
-		//typeext := sqlx.BindType(p.DBGO.DriverName())
-		sqltemp, args, err = sqlx.Named(query.Querie, query.Args)
-		sqltemp, args, err = sqlx.In(sqltemp, args...)
-		sqltemp = p.DBGO.Rebind(sqltemp)
+		sqltemp, args, err = p.NamedIn(query)
 		if err != nil {
 			err = utl.SendErrorCod("CN07")
 			FinChan <- true
@@ -372,8 +389,10 @@ func (p *StConect) QueryStruct(datadest interface{}, query StQuery, indConect bo
 */
 func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) {
 	var (
-		err   error
-		filas *sqlx.Rows
+		err     error
+		filas   *sqlx.Rows
+		sqltemp string
+		args    []interface{}
 	)
 
 	FinChan := make(chan bool)
@@ -386,8 +405,14 @@ func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) 
 			FinChan <- true
 			return
 		}
+		sqltemp, args, err = p.NamedIn(query)
+		if err != nil {
+			err = utl.SendErrorCod("CN07")
+			FinChan <- true
+			return
+		}
 
-		filas, err = p.DBGO.NamedQuery(query.Querie, query.Args)
+		filas, err = p.DBGO.Queryx(sqltemp, args...)
 		if err != nil {
 			p.Close()
 			err = utl.SendErrorCod("CN07")
@@ -419,44 +444,6 @@ func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) 
 
 }
 
-/*QueryGO : Ejecuta un querie en la base de datos y
-  devuelve un map dinamico para mostrar los datos donde le limitan la cantida
-	de registro que debe de devolver
-  Ejemplo:
-  map[COD_CLI:50364481 NIS_RAD:5355046 SEC_NIS:1] */
-func (p *StConect) QueryGO(query StQuery, cantrow int) (chan utl.JSON, error) {
-	var (
-		err      error
-		filas    *sqlx.Rows
-		columnas []string
-	)
-	if cantrow == 0 {
-		return nil, utl.SendErrorCod("CN15")
-	}
-	err = p.Con()
-	if err != nil {
-		return nil, utl.SendErrorCod("CN14")
-	}
-	filas, err = p.DBGO.NamedQuery(query.Querie, query.Args)
-	if err != nil {
-		p.Close()
-		return nil, utl.SendErrorCod("CN18")
-	}
-	columnas, err = filas.Columns()
-	if err != nil {
-		return nil, utl.SendErrorCod("CN19")
-	}
-	dataChan := make(chan utl.JSON)
-	errChan := make(chan error)
-	go ScanDataGeneric(filas, columnas, cantrow, dataChan, errChan)
-
-	if <-errChan != nil {
-		return nil, utl.SendErrorCod("CN07")
-	}
-	p.Close()
-	return dataChan, nil
-}
-
 /*Query : Ejecuta un querie en la base de datos y
   devuelve un map dinamico para mostrar los datos donde le limitan la cantida
 	de registro que debe de devolver
@@ -466,9 +453,11 @@ func (p *StConect) QueryGO(query StQuery, cantrow int) (chan utl.JSON, error) {
 */
 func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, error) {
 	var (
-		err    error
-		filas  *sqlx.Rows
-		result []StData
+		err     error
+		filas   *sqlx.Rows
+		result  []StData
+		args    []interface{}
+		sqltemp string
 	)
 	if cantrow == 0 {
 		return nil, utl.SendErrorCod("CN15")
@@ -484,8 +473,8 @@ func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, 
 			FinChan <- true
 			return
 		}
-
-		filas, err = p.DBGO.NamedQuery(query.Querie, query.Args)
+		sqltemp, args, err = p.NamedIn(query)
+		filas, err = p.DBGO.Queryx(sqltemp, args...)
 		if err != nil {
 			p.Close()
 			FinChan <- true
