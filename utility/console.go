@@ -8,6 +8,20 @@ import (
 	color "github.com/fatih/color"
 )
 
+/*NumProcSet : setea los numeros de proceso validos */
+func NumProcSet(n int) int {
+	return runtime.GOMAXPROCS(n)
+}
+
+/*GetCPU : envia la cantidad de CPU disponible en el procesador */
+func GetCPU() int {
+	n := runtime.NumCPU()
+	if n <= 0 {
+		return 1
+	}
+	return n
+}
+
 /*MsjPc : envia un string de color personalizado de las
 constantes disponible en la libreria */
 func MsjPc(c Pc, format string, arg ...interface{}) string {
