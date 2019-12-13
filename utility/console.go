@@ -8,6 +8,16 @@ import (
 	color "github.com/fatih/color"
 )
 
+/*MaxCPUtask : maxima multi hilos que puede obtener   */
+func MaxCPUtask() int {
+	maxProcs := runtime.GOMAXPROCS(0)
+	numCPU := runtime.NumCPU()
+	if maxProcs < numCPU {
+		return maxProcs
+	}
+	return numCPU
+}
+
 /*NumProcSet : setea los numeros de proceso validos */
 func NumProcSet(n int) int {
 	return runtime.GOMAXPROCS(n)
