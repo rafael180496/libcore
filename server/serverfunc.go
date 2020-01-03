@@ -7,6 +7,30 @@ import (
 	"github.com/mssola/user_agent"
 )
 
+/*ResultJSON : envia un json de los resultado del api rest */
+func (p *StDataEnv) ResultJSON(e echo.Context) error {
+	return e.JSON(p.Code, p)
+}
+
+/*ResultCodeJSON : envia un json de los resultado del api rest pero asignando el codigo */
+func (p *StDataEnv) ResultCodeJSON(code int, e echo.Context) error {
+	p.Code = code
+	return e.JSON(p.Code, p)
+}
+
+/*ResultFullJSON : envia un json de los resultado del api rest pero asignando el codigo la data y el mensaje */
+func (p *StDataEnv) ResultFullJSON(code int, msjerr string, data interface{}, e echo.Context) error {
+	p.Code = code
+	p.Error = msjerr
+	p.Data = data
+	return e.JSON(p.Code, p)
+}
+
+/*JSONSend : envia un json generic  */
+func JSONSend(data StDataEnv, e echo.Context) error {
+	return e.JSON(data.Code, data)
+}
+
 /*FindInfoReq : Envia la informacion de un request despues de una peticion */
 func FindInfoReq(c echo.Context) (StInfoReq, error) {
 	var (
@@ -20,11 +44,6 @@ func FindInfoReq(c echo.Context) (StInfoReq, error) {
 	info.Browser = nombrebrow + " " + versionbrow
 	info.SystemOI = ua.OS()
 	return info, nil
-}
-
-/*JSONSend : envia un json generic  */
-func JSONSend(data StDataEnv, e echo.Context) error {
-	return e.JSON(data.Code, data)
 }
 
 /*Valid : Valida si la peticon es valida*/
