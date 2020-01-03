@@ -6,9 +6,24 @@ type (
 )
 
 var (
+	/*TypeContent : contents type para los formatos de correo */
+	TypeContent = map[string]string{
+		"html": "text/html",
+		"text": "text/plain",
+	}
+	/*SMTPPORT : indica los puertos disponible para el smtp */
+	SMTPPORT = map[string]string{
+		"gmail1":   "587",
+		"hotmail1": "25",
+		"hotmail2": "465",
+		"yahoo1":   "465",
+		"yahoo2":   "587",
+	}
 	/*SMTPURL :  Host de correos */
 	SMTPURL = map[string]string{
-		"gmail": "smtp.gmail.com:587",
+		"gmail":   "smtp.gmail.com",
+		"hotmail": "smtp.live.com",
+		"yahoo":   "smtp.mail.yahoo.com",
 	}
 
 	/*Msj : mensajes de error en las librerias*/

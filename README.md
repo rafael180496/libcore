@@ -139,3 +139,25 @@ var (
 ```go
     EjemploChan := make(chan int)
 ```
+
+**Envio de correo**
+[Soporte de Cuente en gmail](https://www.hostinger.com.ar/tutoriales/como-usar-el-servidor-smtp-gmail-gratuito/)
+**Ejemplo de Envio**
+
+```go
+    func TestEmail(t *testing.T) {
+    t.Logf("Email:%s\n", "Envio")
+    email := utl.StEmailAdmin{}
+    email.AddUser("...@gmail.com",
+        "...*", utl.SMTPURL["gmail"], utl.SMTPPOR    ["gmail1"])
+    email.AddDest("...@thedataage.com")
+    email.AddBody(utl.TypeContent["html"], "Prueba",    "Prueba")
+    err := email.SendMail()
+    if err != nil {
+        t.Logf("Email:%s\n", err.Error())
+    } else {
+        t.Logf("Email:%s\n", "Terminado")
+    }
+
+}
+```

@@ -10,6 +10,19 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+/*ReturnIf : retorna un if ternario
+https://github.com/TheMushrr00m/go-ternary Doc
+ReturnIf(<bool expression>, <result for true>, <result for false>)
+ReturnIf(5 > 4, "It's true", "It's false :(")
+*/
+func ReturnIf(a bool, b, c interface{}) interface{} {
+	if a {
+		return b
+	}
+
+	return c
+}
+
 /*CharRand : Genera una letra aleatoria.*/
 func CharRand() string {
 	ramdom.Seed(time.Now().UnixNano())

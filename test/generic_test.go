@@ -6,6 +6,11 @@ import (
 	utl "github.com/rafael180496/libcore/utility"
 )
 
+/*TestReturnIf : retorna con un condicional */
+func TestReturnIf(t *testing.T) {
+	t.Logf("%s", utl.ReturnIf(5 > 4, "It's true", "It's false"))
+}
+
 /*TestTrim : Quita los espacio de un texto */
 func TestTrim(t *testing.T) {
 	text := "Hola Mundo TDA"
