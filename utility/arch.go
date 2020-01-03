@@ -39,7 +39,7 @@ func (p *StLog) Init() error {
 	NameArch := strings.Replace(p.Dir+"/"+p.Name+FechaText+".log", " ", "", -1)
 
 	if !FileExist(p.Dir, true) {
-		return SendErrorCod("AR05")
+		return Msj.GetError("AR05")
 	}
 	log.SetPrefix(p.Prefix)
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
@@ -106,7 +106,7 @@ func FileExist(Path string, inddir bool) bool {
 func FileNew(p string) (*os.File, error) {
 	f, err := os.OpenFile(p, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		return nil, SendErrorCod("AR03")
+		return nil, Msj.GetError("AR03")
 	}
 	return f, nil
 }
@@ -115,7 +115,7 @@ func FileNew(p string) (*os.File, error) {
 el path del nuevo archivo.*/
 func TrimFile(Path string) (string, error) {
 	if !FileExist(Path, false) {
-		return "", SendErrorCod("AR01")
+		return "", Msj.GetError("AR01")
 	}
 	PathOrig := Path
 	Path = Trim(strings.Replace(Path, "\r", "", -1))
@@ -133,7 +133,7 @@ func DirNew(Path string) error {
 	}
 	err := os.MkdirAll(Path, os.ModePerm)
 	if err != nil {
-		return SendErrorCod("AR02")
+		return Msj.GetError("AR02")
 	}
 	return nil
 }

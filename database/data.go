@@ -26,7 +26,7 @@ type (
 func (p *StData) ToJSON() ([]byte, error) {
 	jsonData, err := json.Marshal(&p)
 	if err != nil {
-		return nil, utl.SendErrorCod("CN01")
+		return nil, utl.Msj.GetError("CN01")
 	}
 	return jsonData, nil
 }
@@ -51,7 +51,7 @@ func (p *StData) ToString(columna string) (string, error) {
 		return utl.Float64ToStr(float64(valor.(float32))), nil
 
 	}
-	return fmt.Sprintf("%v", valor), utl.SendErrorCod("CN02")
+	return fmt.Sprintf("%v", valor), utl.Msj.GetError("CN02")
 }
 
 /*ToInt : Convierte el valor del map interface{} a int.*/
@@ -71,7 +71,7 @@ func (p *StData) ToInt(columna string) (int, error) {
 
 	}
 
-	return 0, utl.SendErrorCod("CN03")
+	return 0, utl.Msj.GetError("CN03")
 }
 
 /*ToBool : Convierte el valor del map interface{} a bool.*/
@@ -101,7 +101,7 @@ func (p *StData) ToInt64(columna string) (int64, error) {
 	case int64:
 		return valor.(int64), nil
 	}
-	return 0, utl.SendErrorCod("CN03")
+	return 0, utl.Msj.GetError("CN03")
 }
 
 /*envTableData : convierte los datos en tipos  json */
@@ -118,13 +118,13 @@ func envTableData(tableData []map[string]interface{}, datachan chan utl.JSON, er
 func ValidSelect(sql string) error {
 	sql = strings.ToLower(sql)
 	if strings.Replace(sql, " ", "", -1) == "" {
-		return utl.SendErrorCod("CN05")
+		return utl.Msj.GetError("CN05")
 	}
 	if strings.Contains(sql, INSERT) || strings.Contains(sql, DELETE) || strings.Contains(sql, UPDATE) {
-		return utl.SendErrorCod("CN05")
+		return utl.Msj.GetError("CN05")
 	}
 	if !strings.Contains(sql, SELECT) || !strings.Contains(sql, FROM) {
-		return utl.SendErrorCod("CN05")
+		return utl.Msj.GetError("CN05")
 	}
 
 	return nil
@@ -141,7 +141,7 @@ func validTipDB(sqlOrig string, tipo string) error {
 	case INSERT:
 		valid = strings.Contains(sqlOrig, INSERT)
 		if !valid {
-			return utl.SendErrorCod("CN04")
+			return utl.Msj.GetError("CN04")
 		}
 		return nil
 	case UPDATE, DELETE:
@@ -149,12 +149,12 @@ func validTipDB(sqlOrig string, tipo string) error {
 		if !valid {
 			valid = strings.Contains(sqlOrig, DELETE)
 			if !valid {
-				return utl.SendErrorCod("CN05")
+				return utl.Msj.GetError("CN05")
 			}
 		}
 		return nil
 	default:
-		return utl.SendErrorCod("CN05")
+		return utl.Msj.GetError("CN05")
 	}
 
 }
@@ -187,7 +187,7 @@ func scanData(rows *sqlx.Rows, cantrow int) ([]StData, error) {
 	)
 	columnas, err = rows.Columns()
 	if err != nil {
-		return result, utl.SendErrorCod("CN06")
+		return result, utl.Msj.GetError("CN06")
 	}
 	ptrData := make([]interface{}, len(columnas))
 	valores := make([]interface{}, len(columnas))
@@ -203,7 +203,7 @@ func scanData(rows *sqlx.Rows, cantrow int) ([]StData, error) {
 		}
 		err = rows.Scan(ptrData...)
 		if err != nil {
-			return result, utl.SendErrorCod("CN07")
+			return result, utl.Msj.GetError("CN07")
 		}
 		data := sendData(valores, columnas)
 		result = append(result, data)

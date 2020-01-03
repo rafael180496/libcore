@@ -97,24 +97,24 @@ func (p *StConect) ConfigJSON(PathJSON string) error {
 		ptrArch *os.File
 	)
 	if !utl.FileExist(PathJSON, false) || !utl.FileExt(PathJSON, "JSON") {
-		return utl.SendErrorCod("CN09")
+		return utl.Msj.GetError("CN09")
 	}
 	PathJSON, err = utl.TrimFile(PathJSON)
 	if err != nil {
-		return utl.SendErrorCod("CN08")
+		return utl.Msj.GetError("CN08")
 	}
 	ptrArch, err = os.Open(PathJSON)
 	if err != nil {
-		return utl.SendErrorCod("CN08")
+		return utl.Msj.GetError("CN08")
 	}
 	defer ptrArch.Close()
 	decJSON := json.NewDecoder(ptrArch)
 	err = decJSON.Decode(&cad)
 	if err != nil {
-		return utl.SendErrorCod("CN08")
+		return utl.Msj.GetError("CN08")
 	}
 	if !cad.ValidCad() {
-		return utl.SendErrorCod("CN12")
+		return utl.Msj.GetError("CN12")
 	}
 	p.Conexion = cad
 	return nil
@@ -146,12 +146,12 @@ func (p *StConect) ConfigINI(PathINI string) error {
 		cad StCadConect
 	)
 	if !utl.FileExist(PathINI, false) || !utl.FileExt(PathINI, "INI") {
-		return utl.SendErrorCod("CN10")
+		return utl.Msj.GetError("CN10")
 	}
 
 	iniArch, err := ini.Load(PathINI)
 	if err != nil {
-		return utl.SendErrorCod("CN11")
+		return utl.Msj.GetError("CN11")
 	}
 	cad.Usuario = iniArch.Section("database").Key("usuario").String()
 	cad.Clave = iniArch.Section("database").Key("clave").String()
@@ -165,7 +165,7 @@ func (p *StConect) ConfigINI(PathINI string) error {
 	/*opcional configuracion temporal*/
 	cad.Sslmode = iniArch.Section("database").Key("sslmode").String()
 	if !cad.ValidCad() {
-		return utl.SendErrorCod("CN12")
+		return utl.Msj.GetError("CN12")
 	}
 	p.Conexion = cad
 	return nil
@@ -227,7 +227,7 @@ func (p *StConect) Con() error {
 		fmt.Fprintf(&cadena, CADCONN[Sqlser], p.Conexion.Host, p.Conexion.Usuario, p.Conexion.Clave, p.Conexion.Puerto, p.Conexion.Nombre)
 		break
 	default:
-		return utl.SendErrorCod("CN13")
+		return utl.Msj.GetError("CN13")
 	}
 
 	if p.DBGO != nil {
@@ -236,7 +236,7 @@ func (p *StConect) Con() error {
 	if errping != nil || p.DBGO == nil {
 		p.DBGO, err = sqlx.Connect(PrefijosDB[p.Conexion.Tipo], cadena.String())
 		if err != nil {
-			return utl.SendErrorCod("CN14")
+			return utl.Msj.GetError("CN14")
 		}
 	}
 	return nil
@@ -273,7 +273,7 @@ func (p *StConect) Exec(Data []StQuery, tipDB string) (sql.Result, error) {
 	go func() {
 		err = p.Con()
 		if err != nil {
-			err = utl.SendErrorCod("CN14")
+			err = utl.Msj.GetError("CN14")
 			FinChan <- true
 			return
 		}
@@ -300,7 +300,7 @@ func (p *StConect) Exec(Data []StQuery, tipDB string) (sql.Result, error) {
 		if err != nil {
 			p.Close()
 			tx.Rollback()
-			err = utl.SendErrorCod("CN17")
+			err = utl.Msj.GetError("CN17")
 			FinChan <- true
 			return
 		}
@@ -342,13 +342,13 @@ func (p *StConect) QueryStruct(datadest interface{}, query StQuery, indConect bo
 
 		err = p.Con()
 		if err != nil {
-			err = utl.SendErrorCod("CN14")
+			err = utl.Msj.GetError("CN14")
 			FinChan <- true
 			return
 		}
 		sqltemp, args, err = p.NamedIn(query)
 		if err != nil {
-			err = utl.SendErrorCod("CN07")
+			err = utl.Msj.GetError("CN07")
 			FinChan <- true
 			return
 		}
@@ -401,13 +401,13 @@ func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) 
 
 		err = p.Con()
 		if err != nil {
-			err = utl.SendErrorCod("CN14")
+			err = utl.Msj.GetError("CN14")
 			FinChan <- true
 			return
 		}
 		sqltemp, args, err = p.NamedIn(query)
 		if err != nil {
-			err = utl.SendErrorCod("CN07")
+			err = utl.Msj.GetError("CN07")
 			FinChan <- true
 			return
 		}
@@ -415,7 +415,7 @@ func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) 
 		filas, err = p.DBGO.Queryx(sqltemp, args...)
 		if err != nil {
 			p.Close()
-			err = utl.SendErrorCod("CN07")
+			err = utl.Msj.GetError("CN07")
 			FinChan <- true
 			return
 		}
@@ -460,7 +460,7 @@ func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, 
 		sqltemp string
 	)
 	if cantrow == 0 {
-		return nil, utl.SendErrorCod("CN15")
+		return nil, utl.Msj.GetError("CN15")
 	}
 
 	FinChan := make(chan bool)
@@ -469,7 +469,7 @@ func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, 
 
 		err = p.Con()
 		if err != nil {
-			err = utl.SendErrorCod("CN14")
+			err = utl.Msj.GetError("CN14")
 			FinChan <- true
 			return
 		}
@@ -484,7 +484,7 @@ func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, 
 		if err != nil {
 			p.Close()
 			filas.Close()
-			err = utl.SendErrorCod("CN16")
+			err = utl.Msj.GetError("CN16")
 			FinChan <- true
 			return
 		}

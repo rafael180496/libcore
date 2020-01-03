@@ -15,7 +15,7 @@ type (
 func NewJSON(v interface{}) (JSON, error) {
 	d, err := json.Marshal(v)
 	if err != nil {
-		return d, SendErrorCod("JS01")
+		return d, Msj.GetError("JS01")
 	}
 	return d, nil
 }
@@ -24,7 +24,7 @@ func NewJSON(v interface{}) (JSON, error) {
 func ParseJSON(d JSON, v interface{}) error {
 	err := json.Unmarshal(d, v)
 	if err != nil {
-		return SendErrorCod("JS02")
+		return Msj.GetError("JS02")
 	}
 	return nil
 }
@@ -33,7 +33,7 @@ func ParseJSON(d JSON, v interface{}) error {
 func JSONtoObj(d JSON) ([]map[string]interface{}, error) {
 	var objs []map[string]interface{}
 	if bytes.Equal(d, []byte("null")) {
-		return objs, SendErrorCod("JS03")
+		return objs, Msj.GetError("JS03")
 	}
 	var v interface{}
 	err := ParseJSON(d, &v)
@@ -50,7 +50,7 @@ func JSONtoObj(d JSON) ([]map[string]interface{}, error) {
 	case []map[string]interface{}:
 		objs = vv
 	default:
-		return nil, SendErrorCod("JS04")
+		return nil, Msj.GetError("JS04")
 	}
 
 	return objs, nil

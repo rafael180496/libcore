@@ -24,8 +24,3 @@ func (p *StError) MandError(mensaje string) error {
 	p.When = time.Now()
 	return p
 }
-
-/*SendErrorCod : envia un error con los mensajes guardados */
-func SendErrorCod(cod string) error {
-	return new(StError).MandError(Msj[cod])
-}

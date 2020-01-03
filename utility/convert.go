@@ -75,7 +75,7 @@ func RoundFloat64(valor float64, dec int) float64 {
 func StrToFloat64(val string) (float64, error) {
 	Float64, err := strconv.ParseFloat(val, 64)
 	if err != nil {
-		return 0, SendErrorCod("CO01")
+		return 0, Msj.GetError("CO01")
 	}
 	return Float64, nil
 }
@@ -89,7 +89,7 @@ func Float64ToStr(val float64) string {
 func StrToInt64(val string) (int64, error) {
 	int64, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
-		return 0, SendErrorCod("CO02")
+		return 0, Msj.GetError("CO02")
 	}
 	return int64, nil
 }
@@ -103,7 +103,7 @@ func Int64ToStr(val int64) string {
 func StrToInt32(val string) (int32, error) {
 	int64, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
-		return 0, SendErrorCod("CO03")
+		return 0, Msj.GetError("CO03")
 	}
 	return int32(int64), nil
 }

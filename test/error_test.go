@@ -8,5 +8,5 @@ import (
 
 /*TestSendError : Envia un error con mensaje */
 func TestSendError(t *testing.T) {
-	t.Logf("Error:%s", utility.SendErrorCod("GE01").Error())
+	t.Logf("Error:%s", utility.Msj.GetError("GE01").Error())
 }
