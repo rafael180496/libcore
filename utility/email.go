@@ -40,7 +40,7 @@ func (p *StEmailAdmin) SendMail() error {
 		smtp.PlainAuth("", p.User.Email, p.User.Pass, host),
 		p.User.Email, p.Dest, []byte(p.ArmarEmail()))
 	if err != nil {
-		return err //SendErrorCod("ER01")
+		return err
 	}
 	return nil
 }

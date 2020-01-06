@@ -49,13 +49,13 @@ func FindInfoReq(c echo.Context) (StInfoReq, error) {
 /*Valid : Valida si la peticon es valida*/
 func (p *HTTPPet) Valid() error {
 	if !p.Tip.Valid() {
-		return utl.SendErrorCod("SR01")
+		return utl.Msj.GetError("SR01")
 	}
 	if utl.Trim(p.Path) == "" || utl.IsSpace(p.Path) {
-		return utl.SendErrorCod("SR02")
+		return utl.Msj.GetError("SR02")
 	}
 	if p.Pet == nil {
-		return utl.SendErrorCod("SR03")
+		return utl.Msj.GetError("SR03")
 	}
 	return nil
 }
@@ -112,6 +112,6 @@ func findpet(e *echo.Echo, p HTTPPet) error {
 		e.DELETE(p.Path, p.Pet)
 		return nil
 	default:
-		return utl.SendErrorCod("SR01")
+		return utl.Msj.GetError("SR01")
 	}
 }
