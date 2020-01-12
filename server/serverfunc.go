@@ -4,7 +4,7 @@ import (
 	utl "github.com/rafael180496/libcore/utility"
 
 	echo "github.com/labstack/echo/v4"
-	"github.com/mssola/user_agent"
+	agent "github.com/mssola/user_agent"
 )
 
 /*ResultJSON : envia un json de los resultado del api rest */
@@ -36,7 +36,7 @@ func FindInfoReq(c echo.Context) (StInfoReq, error) {
 	var (
 		info StInfoReq
 	)
-	ua := user_agent.New(c.Request().UserAgent())
+	ua := agent.New(c.Request().UserAgent())
 	info.UserAgent = c.Request().UserAgent()
 	info.HostOrig = c.Scheme() + "://" + c.Request().Host
 	nombrebrow, versionbrow := ua.Browser()

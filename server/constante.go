@@ -1,6 +1,6 @@
 package server
 
-import "github.com/labstack/echo/v4"
+import echo "github.com/labstack/echo/v4"
 
 type (
 	/*StInfoReq :  Obtiene  datos generales del request*/
