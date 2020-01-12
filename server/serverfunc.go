@@ -3,7 +3,7 @@ package server
 import (
 	utl "github.com/rafael180496/libcore/utility"
 
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
 	"github.com/mssola/user_agent"
 )
 
