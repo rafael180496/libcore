@@ -2,6 +2,7 @@ package utility
 
 import (
 	"fmt"
+	"net"
 	"runtime"
 	"strings"
 
@@ -145,6 +146,23 @@ func sendColor(item Pc) color.Attribute {
 
 	}
 
+}
+
+/*GetLocalIPV4 : te envia la ip local que contiene la maquina que estas ejecutando el programa */
+func GetLocalIPV4() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ""
+	}
+	for _, address := range addrs {
+		// check the address type and if it is not a loopback the display it
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
 }
 
 /*IsLinux : Valida si estas en un sistema operativo linux */

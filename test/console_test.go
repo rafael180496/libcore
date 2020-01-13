@@ -22,6 +22,11 @@ func TestMsjGreen(t *testing.T) {
 	utl.PrintPc(utl.Green, "Texto:Hola\n")
 }
 
+/*TestMsjGreen : Envie un string en color verde*/
+func TestIP4(t *testing.T) {
+	t.Logf("IPLOCAL:%s\n", utl.GetLocalIPV4())
+}
+
 /*TestMsjPc : prueba todos los texto disponible */
 func TestMsjPc(t *testing.T) {
 	t.Logf("Texto:%s", utl.MsjPc(utl.Green, "%s", utl.Green))
