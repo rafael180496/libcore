@@ -72,6 +72,7 @@ var (
 			"JS04": "Error al capturar json.",
 			//Libreria de Email
 			"ER01": "Error en enviar el mensaje",
+			"ER02": "No pasa las validaciones",
 			/*libreria server */
 			"SR01": "Tipo  de peticion incorrecta.",
 			"SR02": "El Path es invalido.",

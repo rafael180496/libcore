@@ -32,6 +32,21 @@ type (
 	}
 )
 
+/*Validar valida una estructura  StAuthEmail*/
+func (p *StAuthEmail) Validar() bool {
+	return ReturnIf(Trim(p.Email) == "" || Trim(p.Pass) == "" || Trim(p.Host) == "" || Trim(p.Port) == "", false, true).(bool)
+}
+
+/*Validar valida una estructura  StEmail*/
+func (p *StEmail) Validar() bool {
+	return ReturnIf(Trim(p.HeadMsg) == "" || Trim(p.BodyMsg) == "" || Trim(p.ContentType) == "", false, true).(bool)
+}
+
+/*Validar valida una estructura  StEmailAdmin*/
+func (p *StEmailAdmin) Validar() bool {
+	return ReturnIf(!p.User.Validar() || !p.Email.Validar() || len(p.Dest) <= 0, false, true).(bool)
+}
+
 /*SendMail : envia una cantidad X de correo masivo*/
 func (p *StEmailAdmin) SendMail() error {
 	host := p.User.Host
