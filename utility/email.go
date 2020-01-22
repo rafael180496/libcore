@@ -20,17 +20,17 @@ type (
 
 	/*StAuthEmail  : credenciales para enviar correo */
 	StAuthEmail struct {
-		Email string `json:"email" valid:"email,required,null"`
-		Pass  string `json:"pass" valid:"required,length(1,500),null"`
-		Host  string `json:"smtp" valid:"required,length(1,500),null"`
-		Port  string `json:"port" valid:"numeric,required,null"`
+		Email string `json:"email" valid:"email,required"`
+		Pass  string `json:"pass" valid:"required,length(1,500)"`
+		Host  string `json:"smtp" valid:"required,length(1,500)"`
+		Port  string `json:"port" valid:"numeric,required"`
 	}
 
 	/*StEmail : estructura para enviar correo  */
 	StEmail struct {
-		HeadMsg     string `json:"head" valid:"required,length(1,500),null"`
-		BodyMsg     string `json:"body" valid:"required,length(1,10000),null"`
-		ContentType string `json:"content" valid:"required,length(1,500),null"`
+		HeadMsg     string `json:"head" valid:"required,length(1,500)"`
+		BodyMsg     string `json:"body" valid:"required,length(1,10000)"`
+		ContentType string `json:"content" valid:"required,length(1,500)"`
 	}
 )
 
