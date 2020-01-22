@@ -3,6 +3,7 @@ module github.com/rafael180496/libcore
 go 1.13
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0
 	github.com/fatih/color v1.7.0
 	github.com/go-ini/ini v1.51.0

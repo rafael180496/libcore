@@ -149,7 +149,7 @@ var (
     t.Logf("Email:%s\n", "Envio")
     email := utl.StEmailAdmin{}
     email.AddUser("...@gmail.com",
-        "...*", utl.SMTPURL["gmail"], utl.SMTPPOR    ["gmail1"])
+        "...*", utl.SMTPURL["gmail"], utl.SMTPPORT["gmail1"])
     email.AddDest("...@thedataage.com")
     email.AddBody(utl.TypeContent["html"], "Prueba",    "Prueba")
     err := email.SendMail()
