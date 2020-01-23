@@ -1,6 +1,8 @@
 package server
 
 import (
+	"strings"
+
 	utl "github.com/rafael180496/libcore/utility"
 
 	echo "github.com/labstack/echo/v4"
@@ -114,4 +116,9 @@ func findpet(e *echo.Echo, p HTTPPet) error {
 	default:
 		return utl.Msj.GetError("SR01")
 	}
+}
+
+/*ExtKey : extrae el key de la sesion en el api */
+func ExtKey(c echo.Context) string {
+	return strings.Replace(c.Request().Header.Get("Authorization"), "Bearer ", "", -1)
 }
