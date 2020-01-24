@@ -9,6 +9,23 @@ import (
 	agent "github.com/mssola/user_agent"
 )
 
+/*InfPetKey : captura la informacion de una peticion y un token valido*/
+func InfPetKey(c echo.Context) (StInfoPet, string) {
+	info := StInfoPet{}
+	key := ExtKey(c)
+	info.Method = c.Request().Method
+	info.URL = c.Path()
+	return info, key
+}
+
+/*InfPet : captura la informacion de una peticion*/
+func InfPet(c echo.Context) StInfoPet {
+	info := StInfoPet{}
+	info.Method = c.Request().Method
+	info.URL = c.Path()
+	return info
+}
+
 /*ResultJSON : envia un json de los resultado del api rest */
 func (p *StDataEnv) ResultJSON(e echo.Context) error {
 	return e.JSON(p.Code, p)

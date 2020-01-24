@@ -3,6 +3,11 @@ package server
 import echo "github.com/labstack/echo/v4"
 
 type (
+	/*StInfoPet : envia la informacion general de la peticion */
+	StInfoPet struct {
+		URL    string `json:"url"`
+		Method string `json:"method"`
+	}
 	/*StInfoReq :  Obtiene  datos generales del request*/
 	StInfoReq struct {
 		HostOrig  string `json:"host"`
