@@ -128,4 +128,6 @@ const (
 	HWhite Pc = "hw"
 	/*FORMFE : Formato de fecha para los archivo YYYYMMDD*/
 	FORMFE = "%d%02d%02d"
+	/*FormatFechaPostgresql : fomato de fecha de la base  de datos de postgresql*/
+	FormatFechaPostgresql = "2006-01-02"
 )

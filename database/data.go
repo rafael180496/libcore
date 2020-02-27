@@ -12,6 +12,15 @@ import (
 )
 
 type (
+
+	/*StSQLData : Estructura para manipulacion de columnas JSON esto funciona para capturar una sola respuesta a nivel de solucion
+	ejemplo
+	select getdata() as data --> donde data deve ser un json o []byte
+	*/
+	StSQLData struct {
+		Data []byte `db:"data"`
+	}
+
 	/*StQuery : Estructura para ejecutar query de base de datos. */
 	StQuery struct {
 		Querie string `json:"querie"`
