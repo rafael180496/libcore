@@ -65,6 +65,7 @@ var (
 			"CN17": "Error en commit.",
 			"CN18": "Error en al ejecutar querie.",
 			"CN19": "Error en al obtener columna.",
+			"CN20": "El db es sqllite necesita el archivo.db",
 			//libreria json
 			"JS01": "Error al generar un nuevo json.",
 			"JS02": "Error al convertir un json.",
@@ -86,6 +87,7 @@ var (
 		"XML":  ".xml",
 		"RUT":  ".rut",
 		"SQL":  ".sql",
+		"DB":   ".bd",
 	}
 )
 

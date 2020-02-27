@@ -6,7 +6,23 @@ import (
 	db "github.com/rafael180496/libcore/database"
 )
 
-/*TestPost : Se conecta a una base de datos  postgret de configuracion*/
+/*TestSqlLite : Se conecta a una base de datos  sqllite de configuracion*/
+func TestSqlLite(t *testing.T) {
+	var (
+		conexion db.StConect
+	)
+	path := "config/sqllite.ini"
+	t.Logf("Capturando path:%s", path)
+	err := conexion.ConfigINI(path)
+	if err != nil {
+		t.Errorf("Error:%s", err.Error())
+	}
+	t.Logf("Conexion:%s", conexion.Conexion.ToString())
+	t.Logf("Probando...")
+	t.Logf("prueba:%v", conexion.Test())
+}
+
+/*TestPost : Se conecta a una base de datos  posgresql de configuracion*/
 func TestPost(t *testing.T) {
 	var (
 		conexion db.StConect

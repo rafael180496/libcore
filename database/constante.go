@@ -1,6 +1,10 @@
 package database
 
 const (
+	/*SQLLite : conexion tipo sqllite
+	https://github.com/mattn/go-sqlite3
+	*/
+	SQLLite = "SQLLITE"
 	/*Ora : conexion tipo oracle
 	https://gopkg.in/rana/ora.v4
 	*/
@@ -34,25 +38,28 @@ const (
 var (
 	/*CADCONN : contiene el formato de las cadenas de conexion*/
 	CADCONN = map[string]string{
-		Ora:    "%s/%s@%s:%d/%s",
-		Post:   "postgres://%s:%s@%s:%d/%s?sslmode=%s",
-		Mysql:  "%s:%s@tcp(%s:%d)/%s",
-		Sqlser: "server=%s;user id=%s;password=%s;port=%d;database=%s;",
+		Ora:     "%s/%s@%s:%d/%s",
+		Post:    "postgres://%s:%s@%s:%d/%s?sslmode=%s",
+		Mysql:   "%s:%s@tcp(%s:%d)/%s",
+		Sqlser:  "server=%s;user id=%s;password=%s;port=%d;database=%s;",
+		SQLLite: "%s",
 	}
 	/*Prefijos : contiene  los diferentes prefijos de distintas base de datos.
 	Ejemplo: select * from cliente where nombre=:n sera reemplazada por :val*/
 	Prefijos = map[string]string{
-		Ora:    ":val",
-		Post:   "$",
-		Mysql:  "?",
-		Sqlser: ":",
+		Ora:     ":val",
+		Post:    "$",
+		Mysql:   "?",
+		Sqlser:  ":",
+		SQLLite: "?",
 	}
 	/*PrefijosDB : contiene los string de conexion al momento de ejecutar la funcion open*/
 	PrefijosDB = map[string]string{
-		Ora:    "ora",
-		Post:   "postgres",
-		Mysql:  "mysql",
-		Sqlser: "mssql",
+		Ora:     "ora",
+		Post:    "postgres",
+		Mysql:   "mysql",
+		Sqlser:  "mssql",
+		SQLLite: "sqlite3",
 	}
 	/*Ssmodes : hace referencia si tienen conexion ssl
 	0* disable - No SSL

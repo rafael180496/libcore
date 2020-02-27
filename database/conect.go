@@ -19,11 +19,14 @@ import (
 	_ "gopkg.in/rana/ora.v4"
 	/*Conexion a sql server*/
 	_ "github.com/denisenkom/go-mssqldb"
+	/*Conexion a sqllite*/
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type (
 	/*StCadConect : Estructura para generar la cadena de  conexiones de base de datos */
 	StCadConect struct {
+		File    string `json:"filedb"`
 		Usuario string `json:"usuario"`
 		Clave   string `json:"clave"`
 		Nombre  string `json:"nombre"`
@@ -73,6 +76,21 @@ func (p *StConect) NamedIn(query StQuery) (string, []interface{}, error) {
 	return sqltemp, args, err
 }
 
+/*Trim : Elimina los espacio en cualquier campo string */
+func (p *StCadConect) Trim() {
+	p.File = utl.Trim(p.File)
+	p.Usuario = utl.Trim(p.Usuario)
+	p.Clave = utl.Trim(p.Clave)
+	p.Nombre = utl.Trim(p.Nombre)
+	p.Tipo = utl.Trim(p.Tipo)
+	p.Host = utl.Trim(p.Host)
+	p.Sslmode = utl.Trim(p.Sslmode)
+	if p.Tipo == Post && p.Sslmode == "" {
+		p.Sslmode = Ssmodes[0]
+	}
+
+}
+
 /*ConfigJSON : Lee las configuraciones de conexion mediante un .json
 
 Ejemplo:
@@ -85,7 +103,8 @@ Ejemplo:
 	"tipo":"POST",
 	"host":"Localhost",
 	"puerto":3000,
-	"sslmode":""
+	"sslmode":"",
+	"filedb":""
 
 }
 
@@ -140,6 +159,8 @@ host = Localhost
 
 sslmode = opcional
 
+filedb = opcional sqllite
+
 */
 func (p *StConect) ConfigINI(PathINI string) error {
 	var (
@@ -157,6 +178,7 @@ func (p *StConect) ConfigINI(PathINI string) error {
 	cad.Clave = iniArch.Section("database").Key("clave").String()
 	cad.Nombre = iniArch.Section("database").Key("nombre").String()
 	cad.Tipo = iniArch.Section("database").Key("tipo").String()
+	cad.File = iniArch.Section("database").Key("filedb").String()
 	cad.Puerto, err = iniArch.Section("database").Key("puerto").Int()
 	if err != nil {
 		cad.Puerto = 0
@@ -179,52 +201,45 @@ func (p *StConect) TranSQL(SQL string) string {
 /*ToString : Muestra la estructura  StCadConect*/
 func (p *StCadConect) ToString() string {
 	var cadena strings.Builder
-	fmt.Fprintf(&cadena, "[%s|%s|%s|%d|%s|%s|%s]", p.Clave, p.Host, p.Nombre, p.Puerto, p.Sslmode, p.Tipo, p.Usuario)
+	fmt.Fprintf(&cadena, "[%s|%s|%s|%d|%s|%s|%s|%s]", p.Clave, p.Host, p.Nombre, p.Puerto, p.Sslmode, p.Tipo, p.Usuario, p.File)
 	return cadena.String()
 }
 
 /*ValidCad : valida la cadena de conexion capturada */
 func (p *StCadConect) ValidCad() bool {
-	p.Clave = utl.Trim(p.Clave)
-	p.Usuario = utl.Trim(p.Usuario)
-	p.Nombre = utl.Trim(p.Nombre)
-	p.Tipo = utl.Trim(p.Tipo)
-	p.Host = utl.Trim(p.Host)
-	if p.Clave == "" || p.Usuario == "" || p.Nombre == "" || p.Tipo == "" || p.Host == "" {
-		return false
-	}
-	if p.Puerto <= 0 {
-		return false
-	}
-	if p.Tipo == Post && p.Sslmode == "" {
-		p.Sslmode = Ssmodes[0]
-	}
-	return true
+	p.Trim()
+	return utl.ReturnIf(
+		(p.Tipo != SQLLite && (p.Clave == "" || p.Usuario == "" || p.Nombre == "" || p.Tipo == "" || p.Host == "" || p.Puerto <= 0 || p.Sslmode == "")) || (p.Tipo == SQLLite && p.File == ""), false, true).(bool)
+
 }
 
 /*Con : Crear una conexion ala base de datos configurada en la cadena.*/
 func (p *StConect) Con() error {
 	var (
-		err     error
-		errping error
-		cadena  strings.Builder
+		err, errping error
+		cadena       strings.Builder
 	)
-
-	switch p.Conexion.Tipo {
+	conexion := p.Conexion
+	tipo := p.Conexion.Tipo
+	switch tipo {
 	case Ora:
 		/*Open("ora", "user/passw@host:port/sid")*/
-		fmt.Fprintf(&cadena, CADCONN[Ora], p.Conexion.Usuario, p.Conexion.Clave, p.Conexion.Host, p.Conexion.Puerto, p.Conexion.Nombre)
+		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
 		break
 	case Post:
 		/*"postgres://user:password@localhost:port/bdnamme?sslmode=verify-full"*/
-		fmt.Fprintf(&cadena, CADCONN[Post], p.Conexion.Usuario, p.Conexion.Clave, p.Conexion.Host, p.Conexion.Puerto, p.Conexion.Nombre, p.Conexion.Sslmode)
+		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre, conexion.Sslmode)
 		break
 	case Mysql:
 		/*sql.Open("mssql", "user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true") */
-		fmt.Fprintf(&cadena, CADCONN[Mysql], p.Conexion.Usuario, p.Conexion.Clave, p.Conexion.Host, p.Conexion.Puerto, p.Conexion.Nombre)
+		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
 		break
 	case Sqlser:
-		fmt.Fprintf(&cadena, CADCONN[Sqlser], p.Conexion.Host, p.Conexion.Usuario, p.Conexion.Clave, p.Conexion.Puerto, p.Conexion.Nombre)
+		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.Host, conexion.Usuario, conexion.Clave, conexion.Puerto, conexion.Nombre)
+		break
+	case SQLLite:
+		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.File)
+
 		break
 	default:
 		return utl.Msj.GetError("CN13")
@@ -234,7 +249,10 @@ func (p *StConect) Con() error {
 		errping = p.DBGO.Ping()
 	}
 	if errping != nil || p.DBGO == nil {
-		p.DBGO, err = sqlx.Connect(PrefijosDB[p.Conexion.Tipo], cadena.String())
+		if (tipo == SQLLite) && (!utl.FileExist(conexion.File, false)) {
+			return utl.Msj.GetError("CN20")
+		}
+		p.DBGO, err = sqlx.Connect(PrefijosDB[tipo], cadena.String())
 		if err != nil {
 			return utl.Msj.GetError("CN14")
 		}
@@ -469,7 +487,6 @@ func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, 
 
 		err = p.Con()
 		if err != nil {
-			err = utl.Msj.GetError("CN14")
 			FinChan <- true
 			return
 		}
@@ -519,7 +536,7 @@ func (p *StConect) Test() bool {
 
 	prueba := new(StQuery)
 	switch p.Conexion.Tipo {
-	case Post, Mysql, Sqlser:
+	case Post, Mysql, Sqlser, SQLLite:
 		prueba.Querie = `SELECT 1`
 	case Ora:
 		prueba.Querie = `SELECT 1 FROM DUAL`
