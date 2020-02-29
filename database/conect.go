@@ -208,9 +208,13 @@ func (p *StCadConect) ToString() string {
 /*ValidCad : valida la cadena de conexion capturada */
 func (p *StCadConect) ValidCad() bool {
 	p.Trim()
-	return utl.ReturnIf(
-		(p.Tipo != SQLLite && (p.Clave == "" || p.Usuario == "" || p.Nombre == "" || p.Tipo == "" || p.Host == "" || p.Puerto <= 0 || p.Sslmode == "")) || (p.Tipo == SQLLite && p.File == ""), false, true).(bool)
-
+	if p.Tipo != SQLLite && (p.Clave == "" || p.Usuario == "" || p.Nombre == "" || p.Tipo == "" || p.Host == "" || p.Puerto <= 0) {
+		return false
+	}
+	if p.Tipo == SQLLite && p.File == "" {
+		return false
+	}
+	return true
 }
 
 /*Con : Crear una conexion ala base de datos configurada en la cadena.*/
