@@ -8,6 +8,15 @@ import (
 )
 
 type (
+	/*StArchMa : estructura maestra que crea directorios o archivos masivos.*/
+	StArchMa struct {
+		Archs []StArch
+	}
+	/*StArch : estructura para registra los archivos y generarlos.*/
+	StArch struct {
+		Path   string
+		IndDir bool
+	}
 	/*StLog : Estructura para crear log personalizados por medio de la fecha
 	directorio/fecha.log
 	*/
@@ -22,6 +31,33 @@ type (
 		Prefix string
 	}
 )
+
+/*Create : crear el archivo o directorio vacio si existe no lo crea */
+func (p *StArchMa) Create() error {
+	for _, item := range p.Archs {
+		err := item.Create()
+		if err != nil {
+			return nil
+		}
+	}
+	return nil
+}
+
+/*Create : crear el archivo o directorio vacio si existe no lo crea */
+func (p *StArch) Create() error {
+	if !FileExist(p.Path, p.IndDir) {
+		var err error
+		if p.IndDir {
+			err = DirNew(p.Path)
+		} else {
+			_, err = FileNew(p.Path)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 /*Printf : Ingresa un texto en los logs asignado. */
 func (p *StLog) Printf(format string, args ...interface{}) error {
