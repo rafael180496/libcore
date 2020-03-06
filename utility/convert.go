@@ -2,6 +2,7 @@ package utility
 
 import (
 	"encoding/hex"
+	"encoding/xml"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -9,6 +10,15 @@ import (
 	"strings"
 	"time"
 )
+
+/*Float64XML : tipo que repara el error de los xml en los millones*/
+type Float64XML float64
+
+/*MarshalXMLAttr : tramforma el xml*/
+func (f Float64XML) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
+	s := fmt.Sprintf("%.2f", f)
+	return xml.Attr{Name: name, Value: s}, nil
+}
 
 /*TimetoStr : Convierte un time al string con el formato YYYYMMDD que esta en constante.*/
 func TimetoStr(dia time.Time) string {
