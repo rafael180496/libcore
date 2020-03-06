@@ -8,6 +8,7 @@ require (
 	github.com/fatih/color v1.7.0
 	github.com/go-ini/ini v1.51.0
 	github.com/go-sql-driver/mysql v1.4.1
+	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/labstack/echo/v4 v4.0.0
 	github.com/lib/pq v1.2.0
