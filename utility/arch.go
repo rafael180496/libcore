@@ -1,6 +1,8 @@
 package utility
 
 import (
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -164,12 +166,144 @@ func TrimFile(Path string) (string, error) {
 
 /*DirNew : Crea una carpeta vacia en el sistema*/
 func DirNew(Path string) error {
-	if Path[len(Path)-1] != '/' {
-		Path = Path + "/"
-	}
-	err := os.MkdirAll(Path, os.ModePerm)
+
+	err := os.MkdirAll(plecaAdd(Path), os.ModePerm)
 	if err != nil {
 		return Msj.GetError("AR02")
 	}
 	return nil
+}
+
+/*CpFile : copia un archivo Origen a un directorio destino*/
+func CpFile(PathOrig, PathDest string) error {
+	fileNew := new(os.File)
+	PathDest = plecaAdd(PathDest)
+	if !FileExist(PathOrig, false) {
+		return Msj.GetError("AR01")
+	}
+	if !FileExist(PathDest, true) {
+		return Msj.GetError("AR05")
+	}
+
+	pathNew, err := TrimFile(PathOrig)
+	if err != nil {
+		return err
+	}
+	fileOrig, err := os.Open(pathNew)
+	if err != nil {
+		return err
+	}
+	infoFile, err := os.Stat(fileOrig.Name())
+	if err != nil {
+		return err
+	}
+	pathFinal := PathDest + infoFile.Name()
+	fileNew, err = FileNew(pathFinal)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(fileNew, fileOrig)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*CpDir : copia una carpeta entera a una carpeta destino*/
+func CpDir(PathOrig, PathDest string) error {
+	PathOrig = plecaAdd(PathOrig)
+	PathDest = plecaAdd(PathDest)
+	if !FileExist(PathOrig, true) {
+		return Msj.GetError("AR05")
+	}
+	if !FileExist(PathDest, true) {
+		err := DirNew(PathDest)
+		if err != nil {
+			return err
+		}
+	}
+	archs, err := ListDir(PathOrig)
+	if err != nil {
+		return err
+	}
+	for _, arch := range archs {
+		if arch.IsDir() {
+			err = CpDir(PathOrig+arch.Name(), PathDest+arch.Name())
+			if err != nil {
+				return err
+			}
+		} else {
+			err = CpFile(PathOrig+arch.Name(), PathDest)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+/*RmDir : Elimina un directorio entero*/
+func RmDir(src string) error {
+	src = plecaAdd(src)
+	if !FileExist(src, true) {
+		return Msj.GetError("AR05")
+	}
+
+	archs, err := ListDir(src)
+	if err != nil {
+		return err
+	}
+	for _, arch := range archs {
+		if arch.IsDir() {
+			err = RmDir(src + arch.Name())
+			if err != nil {
+				return err
+			}
+		} else {
+			err = RmFile(src + arch.Name())
+			if err != nil {
+				return err
+			}
+		}
+	}
+	err = RmFile(src)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*RmFile : elimina un archivo exacto*/
+func RmFile(file string) error {
+	if !FileExist(file, false) {
+		return Msj.GetError("AR01")
+	}
+	err := os.Remove(file)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*ListDir : lista la infomacion que contiene una carpeta*/
+func ListDir(src string) ([]os.FileInfo, error) {
+	src = plecaAdd(src)
+	if !FileExist(src, true) {
+		return nil, Msj.GetError("AR05")
+	}
+	files, err := ioutil.ReadDir(src)
+	if err != nil {
+		return nil, Msj.GetError("AR06")
+	}
+	return files, nil
+}
+
+/*plecaAdd : coloca la pleca de un directorio*/
+func plecaAdd(src string) string {
+	if src[len(src)-1] != '/' {
+		src = src + "/"
+	}
+	return src
 }

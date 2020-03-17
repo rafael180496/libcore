@@ -45,6 +45,8 @@ var (
 			"AR03": "Error al crear archivo.",
 			"AR04": "Error al crear log.",
 			"AR05": "No existe el directorio.",
+			"AR06": "Problemas en leer directorio.",
+			"AR07": "Error al eliminar un archivo.",
 			//libreria database
 			"CN01": "Error al convertir a json.",
 			"CN02": "Error al convertir a string.",
