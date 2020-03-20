@@ -29,6 +29,12 @@ func CharRand() string {
 	return string(ramdom.Intn(122) + 97)
 }
 
+/*SubString : substring para un string en golang con runas*/
+func SubString(cadena string, ini, cant int) string {
+	runes := []rune(cadena)
+	return string(runes[0:2])
+}
+
 /*Trim : Elimina el espacio de un string a nivel de runas.*/
 func Trim(str string) string {
 	return strings.Map(func(r rune) rune {

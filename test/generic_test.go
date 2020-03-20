@@ -1,10 +1,16 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 
 	utl "github.com/rafael180496/libcore/utility"
 )
+
+/*SubString : recorta una cadena */
+func TestSubString(t *testing.T) {
+	fmt.Printf("%s", utl.SubString("hola", 0, 2))
+}
 
 /*TestReturnIf : retorna con un condicional */
 func TestReturnIf(t *testing.T) {
