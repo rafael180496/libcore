@@ -91,6 +91,32 @@ func (p *StCadConect) Trim() {
 
 }
 
+/*ConfigURL : lee las configuracions de conexion mediante un URL string
+Formato:
+	tipo:usuario/clave/host:puerto/([nombre]-[filedb]-[sslmode])
+	"%s:%s/%s/%s:%d/([%s]-[%s]-[%s])"
+*/
+func (p *StConect) ConfigURL(URL string) error {
+	var (
+		cad StCadConect
+	)
+
+	fmt.Sscanf(URL, CADGENERIC, &cad.Tipo,
+		&cad.Usuario,
+		&cad.Clave,
+		&cad.Host,
+		&cad.Puerto,
+		&cad.Nombre,
+		&cad.File,
+		&cad.Sslmode)
+
+	if !cad.ValidCad() {
+		return utl.Msj.GetError("CN21")
+	}
+	p.Conexion = cad
+	return nil
+}
+
 /*ConfigJSON : Lee las configuraciones de conexion mediante un .json
 
 Ejemplo:

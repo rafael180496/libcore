@@ -68,6 +68,7 @@ var (
 			"CN18": "Error en al ejecutar querie.",
 			"CN19": "Error en al obtener columna.",
 			"CN20": "El db es sqllite necesita el archivo.db",
+			"CN21": "La URL no es valida o le falta parametros",
 			//libreria json
 			"JS01": "Error al generar un nuevo json.",
 			"JS02": "Error al convertir un json.",

@@ -33,6 +33,10 @@ const (
 	SELECT = "select"
 	/*FROM : prefijo de tablas */
 	FROM = "from"
+	/*CADGENERIC : Url generico para conexiones a base de datos
+	tipo:usuario/clave/host:puerto/([nombre]-[filedb]-[sslmode])
+	*/
+	CADGENERIC = "%s:%s/%s/%s:%d/([%s]-[%s]-[%s])"
 )
 
 var (
