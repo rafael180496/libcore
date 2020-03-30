@@ -81,6 +81,12 @@ var (
 			"SR01": "Tipo  de peticion incorrecta.",
 			"SR02": "El Path es invalido.",
 			"SR03": "No contiene una funcion de peticion.",
+			/*libreria database*/
+			"DT01": "El numero de fila supera la cantidad total de filas.",
+			"DT02": "La columna no existe.",
+			"DT03": "No tienen tabla cargada.",
+			"DT04": "No tienen columnas cargada.",
+			"DT05": "Columna duplicada.",
 		},
 	}
 	/*EXT : extensiones de archivos */

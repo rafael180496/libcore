@@ -91,32 +91,6 @@ func (p *StCadConect) Trim() {
 
 }
 
-/*ConfigURL : lee las configuracions de conexion mediante un URL string
-Formato:
-	tipo:usuario/clave/host:puerto/([nombre]-[filedb]-[sslmode])
-	"%s:%s/%s/%s:%d/([%s]-[%s]-[%s])"
-*/
-func (p *StConect) ConfigURL(URL string) error {
-	var (
-		cad StCadConect
-	)
-
-	fmt.Sscanf(URL, CADGENERIC, &cad.Tipo,
-		&cad.Usuario,
-		&cad.Clave,
-		&cad.Host,
-		&cad.Puerto,
-		&cad.Nombre,
-		&cad.File,
-		&cad.Sslmode)
-
-	if !cad.ValidCad() {
-		return utl.Msj.GetError("CN21")
-	}
-	p.Conexion = cad
-	return nil
-}
-
 /*ConfigJSON : Lee las configuraciones de conexion mediante un .json
 
 Ejemplo:
@@ -396,7 +370,6 @@ func (p *StConect) QueryStruct(datadest interface{}, query StQuery, indConect bo
 		}
 		sqltemp, args, err = p.NamedIn(query)
 		if err != nil {
-			err = utl.Msj.GetError("CN07")
 			FinChan <- true
 			return
 		}
@@ -409,11 +382,9 @@ func (p *StConect) QueryStruct(datadest interface{}, query StQuery, indConect bo
 		if !indConect {
 			p.Close()
 		}
-
 		FinChan <- true
 		return
 	}()
-
 	for {
 		select {
 		default:
@@ -463,7 +434,6 @@ func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) 
 		filas, err = p.DBGO.Queryx(sqltemp, args...)
 		if err != nil {
 			p.Close()
-			err = utl.Msj.GetError("CN07")
 			FinChan <- true
 			return
 		}
