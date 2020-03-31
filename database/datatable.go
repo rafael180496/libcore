@@ -85,6 +85,7 @@ func (p *DataTable) AddRow(row StData) {
 
 /*AddIndex : agrega una llave para los delete o update*/
 func (p *DataTable) AddIndex(col string) error {
+	col = strings.ToUpper(col)
 	item, err := p.GetRow(1)
 	if err != nil {
 		return err
@@ -105,7 +106,7 @@ func (p *DataTable) GetRow(row int) (StData, error) {
 }
 
 /*GetRows : Obtiene todas las fila*/
-func (p *DataTable) GetRows(row int) []StData {
+func (p *DataTable) GetRows() []StData {
 	return p.rows
 }
 
@@ -117,7 +118,48 @@ func (p *DataTable) GenInserts() ([]StQuery, error) {
 	if err != nil {
 		return queries, err
 	}
-	fmt.Println(sqltemp)
+	for _, quirie := range p.GetRows() {
+		queries = append(queries, StQuery{
+			Querie: sqltemp,
+			Args:   quirie,
+		})
+	}
+	return queries, nil
+}
+
+/*GenDeletes : genera los delete masivos para modificaciones de base de datos*/
+func (p *DataTable) GenDeletes() ([]StQuery, error) {
+	var queries []StQuery
+	clone := *p
+	sqltemp, err := sqldinamic(clone, "d")
+	if err != nil {
+		return queries, err
+	}
+	cols, _ := p.GetCols()
+	colsnew := utl.FilterExcl(cols, clone.GetIndex())
+	for _, quirie := range p.GetRows() {
+		queries = append(queries, StQuery{
+			Querie: sqltemp,
+			Args:   quirie.Filter(colsnew...),
+		})
+	}
+	return queries, nil
+}
+
+/*GenUpdates : genera los update  masivos para modificaciones de base de datos de ante mano tener que colocar indices*/
+func (p *DataTable) GenUpdates() ([]StQuery, error) {
+	var queries []StQuery
+	clone := *p
+	sqltemp, err := sqldinamic(clone, "u")
+	if err != nil {
+		return queries, err
+	}
+	for _, quirie := range p.GetRows() {
+		queries = append(queries, StQuery{
+			Querie: sqltemp,
+			Args:   quirie,
+		})
+	}
 	return queries, nil
 }
 
@@ -134,9 +176,18 @@ func sqldinamic(data DataTable, acc string) (string, error) {
 	if !validDuplid(cols) {
 		return "", utl.Msj.GetError("DT05")
 	}
+	if utl.InStr(acc, "u", "d") && data.LenIndex() <= 0 {
+		return "", utl.Msj.GetError("DT06")
+	}
 	switch acc {
 	case "i":
 		sqltmp := sqlinsert(table, cols)
+		return sqltmp, nil
+	case "u":
+		sqltmp := sqlupdate(table, cols, data.GetIndex())
+		return sqltmp, nil
+	case "d":
+		sqltmp := sqldelete(table, data.GetIndex())
 		return sqltmp, nil
 	default:
 		return "", nil
@@ -144,12 +195,45 @@ func sqldinamic(data DataTable, acc string) (string, error) {
 	}
 }
 func upperMap(data StData) StData {
-	var datanew StData
+	datanew := make(StData)
 	for k := range data {
 		kNew := strings.ToUpper(k)
 		datanew[kNew] = data[k]
 	}
 	return datanew
+}
+func sqldelete(table string, indices []string) string {
+	sqltmp := fmt.Sprintf("DELETE FROM  %s WHERE ", table)
+	for i, item := range indices {
+		if i == (len(indices) - 1) {
+			sqltmp = fmt.Sprintf("%s %s = :%s", sqltmp, item, item)
+		} else {
+			sqltmp = fmt.Sprintf("%s %s = :%s AND", sqltmp, item, item)
+		}
+	}
+	return sqltmp
+}
+
+func sqlupdate(table string, cols []string, indices []string) string {
+	sqltmp := fmt.Sprintf("UPDATE %s SET", table)
+	values := utl.FilterExcl(cols, indices)
+
+	for i, item := range values {
+		if i == (len(values) - 1) {
+			sqltmp = fmt.Sprintf("%s %s = :%s", sqltmp, item, item)
+		} else {
+			sqltmp = fmt.Sprintf("%s %s = :%s ,", sqltmp, item, item)
+		}
+	}
+	sqltmp = fmt.Sprintf("%s WHERE ", sqltmp)
+	for i, item := range indices {
+		if i == (len(indices) - 1) {
+			sqltmp = fmt.Sprintf("%s %s = :%s", sqltmp, item, item)
+		} else {
+			sqltmp = fmt.Sprintf("%s %s = :%s AND", sqltmp, item, item)
+		}
+	}
+	return sqltmp
 }
 func sqlinsert(table string, cols []string) string {
 	sqltmp := fmt.Sprintf("INSERT INTO %s (", table)

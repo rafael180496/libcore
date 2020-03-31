@@ -10,6 +10,48 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+/*InStr : compara  varios string con uno especifico*/
+func InStr(str string, strs ...string) bool {
+	for _, item := range strs {
+		if str == item {
+			return true
+		}
+	}
+	return false
+}
+
+/*FilterExcl : excluye los registro de un arreglo A  con el B  ejemplo
+A[a,b,c,d]
+B[a,b]
+Result
+[c,d]
+*/
+func FilterExcl(strs []string, excl []string) []string {
+	var ret []string
+	for _, item := range strs {
+		ind := true
+		for _, item2 := range excl {
+			if item2 == item {
+				ind = false
+			}
+		}
+		if ind {
+			ret = append(ret, item)
+		}
+	}
+	return ret
+}
+
+/*FilterStr : filtra un arreglo de string mediante un metodo definido */
+func FilterStr(strs []string, valid func(string) bool) (ret []string) {
+	for _, s := range strs {
+		if valid(s) {
+			ret = append(ret, s)
+		}
+	}
+	return
+}
+
 /*ReturnIf : retorna un if ternario
 https://github.com/TheMushrr00m/go-ternary Doc
 ReturnIf(<bool expression>, <result for true>, <result for false>)

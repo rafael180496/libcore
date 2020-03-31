@@ -200,9 +200,7 @@ func (p *StConect) TranSQL(SQL string) string {
 
 /*ToString : Muestra la estructura  StCadConect*/
 func (p *StCadConect) ToString() string {
-	var cadena strings.Builder
-	fmt.Fprintf(&cadena, "[%s|%s|%s|%d|%s|%s|%s|%s]", p.Clave, p.Host, p.Nombre, p.Puerto, p.Sslmode, p.Tipo, p.Usuario, p.File)
-	return cadena.String()
+	return fmt.Sprintf(FORMATTOSTRCONECT, p.Clave, p.Host, p.Nombre, p.Puerto, p.Sslmode, p.Tipo, p.Usuario, p.File)
 }
 
 /*ValidCad : valida la cadena de conexion capturada */
@@ -217,46 +215,45 @@ func (p *StCadConect) ValidCad() bool {
 	return true
 }
 
+/*strURL : Arma la cadena de conexion dependiendo del tipo*/
+func strURL(tipo string, conexion StCadConect) (string, string) {
+	switch tipo {
+	case Ora:
+		/*Open("ora", "user/passw@host:port/sid")*/
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
+	case Post:
+		/*"postgres://user:password@localhost:port/bdnamme?sslmode=verify-full"*/
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre, conexion.Sslmode)
+	case Mysql:
+		/*sql.Open("mssql", "user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true") */
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
+	case Sqlser:
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Host, conexion.Usuario, conexion.Clave, conexion.Puerto, conexion.Nombre)
+	case SQLLite:
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.File)
+	default:
+		return "", ""
+	}
+}
+
 /*Con : Crear una conexion ala base de datos configurada en la cadena.*/
 func (p *StConect) Con() error {
 	var (
 		err, errping error
-		cadena       strings.Builder
 	)
 	conexion := p.Conexion
-	tipo := p.Conexion.Tipo
-	switch tipo {
-	case Ora:
-		/*Open("ora", "user/passw@host:port/sid")*/
-		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
-		break
-	case Post:
-		/*"postgres://user:password@localhost:port/bdnamme?sslmode=verify-full"*/
-		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre, conexion.Sslmode)
-		break
-	case Mysql:
-		/*sql.Open("mssql", "user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true") */
-		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
-		break
-	case Sqlser:
-		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.Host, conexion.Usuario, conexion.Clave, conexion.Puerto, conexion.Nombre)
-		break
-	case SQLLite:
-		fmt.Fprintf(&cadena, CADCONN[tipo], conexion.File)
-
-		break
-	default:
+	prefijo, cadena := strURL(p.Conexion.Tipo, conexion)
+	if cadena == "" {
 		return utl.Msj.GetError("CN13")
 	}
-
 	if p.DBGO != nil {
 		errping = p.DBGO.Ping()
 	}
 	if errping != nil || p.DBGO == nil {
-		if (tipo == SQLLite) && (!utl.FileExist(conexion.File, false)) {
+		if (p.Conexion.Tipo == SQLLite) && (!utl.FileExist(conexion.File, false)) {
 			return utl.Msj.GetError("CN20")
 		}
-		p.DBGO, err = sqlx.Connect(PrefijosDB[tipo], cadena.String())
+		p.DBGO, err = sqlx.Connect(prefijo, cadena)
 		if err != nil {
 			return utl.Msj.GetError("CN14")
 		}

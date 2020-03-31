@@ -87,6 +87,7 @@ var (
 			"DT03": "No tienen tabla cargada.",
 			"DT04": "No tienen columnas cargada.",
 			"DT05": "Columna duplicada.",
+			"DT06": "No tiene ningun indice asignado",
 		},
 	}
 	/*EXT : extensiones de archivos */

@@ -28,6 +28,18 @@ type (
 	StData map[string]interface{}
 )
 
+/*Filter : Excluye key de un map interface*/
+func (p *StData) Filter(keys ...string) StData {
+	datanew := make(StData)
+	clone := *p
+	for k, vl := range clone {
+		if !utl.InStr(k, keys...) {
+			datanew[k] = vl
+		}
+	}
+	return datanew
+}
+
 /*ValidColum : valida si un campo existe*/
 func (p *StData) ValidColum(col string) bool {
 	for _, item := range p.KeyColum() {

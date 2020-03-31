@@ -17,9 +17,15 @@ func TestDataTable(t *testing.T) {
 	data.AddRow(db.StData{
 		"campo1": 5,
 		"campo2": 5,
+		"campo3": 6,
 	})
-	row, _ := data.GenInserts()
-	fmt.Printf("%v", row)
+	data.AddIndex("campo1")
+	rowi, _ := data.GenInserts()
+	fmt.Printf("%v", rowi)
+	rowu, _ := data.GenUpdates()
+	fmt.Printf("%v", rowu)
+	rowd, _ := data.GenDeletes()
+	fmt.Printf("%v", rowd)
 }
 
 /*TestSqlLite : Se conecta a una base de datos  sqllite de configuracion*/

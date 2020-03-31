@@ -61,6 +61,8 @@ var (
 		Sqlser:  "mssql",
 		SQLLite: "sqlite3",
 	}
+	/*FORMATTOSTRCONECT : formato to string para la conexion de base de datos*/
+	FORMATTOSTRCONECT = "[%s|%s|%s|%d|%s|%s|%s|%s]"
 	/*Ssmodes : hace referencia si tienen conexion ssl
 	0* disable - No SSL
 	1* require - Always SSL (skip verification)
