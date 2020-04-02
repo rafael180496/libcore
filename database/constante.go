@@ -36,6 +36,40 @@ const (
 )
 
 var (
+	/*TESTTABLE : quieries para probar si una tabla existe en la base de datos*/
+	TESTTABLE = map[string]string{
+		Ora: `
+		SELECT CASE WHEN COUNT(*) > 0
+			THEN 1 ELSE 0 END REG
+		FROM ALL_TABLES
+		WHERE  TABLE_NAME = :TABLENAME
+		`,
+		Post: `
+		SELECT CASE WHEN EXISTS (
+			SELECT FROM PG_TABLES
+			WHERE    TABLENAME  = :TABLENAME
+			) THEN 1 ELSE 0 END  REG
+		`,
+		Mysql: `
+		SELECT CASE  WHEN EXISTS(
+			SELECT * FROM INFORMATION_SCHEMA.TABLES
+			WHERE TABLE_NAME = :TABLENAME
+			) > 0 THEN 1 ELSE 0 END REG
+		`,
+		Sqlser: `
+		SELECT CASE  WHEN EXISTS(
+			SELECT * FROM INFORMATION_SCHEMA.TABLES
+			WHERE TABLE_NAME = :TABLENAME
+			) THEN 1 ELSE 0 END REG
+		`,
+		SQLLite: `
+		SELECT CASE  WHEN EXISTS(
+			SELECT *
+            FROM SQLITE_MASTER
+            WHERE TYPE = 'TABLE' AND NAME = :TABLENAME
+			) THEN 1 ELSE 0 END REG
+		`,
+	}
 	/*CADCONN : contiene el formato de las cadenas de conexion*/
 	CADCONN = map[string]string{
 		Ora:     "%s/%s@%s:%d/%s",

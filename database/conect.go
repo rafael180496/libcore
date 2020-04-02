@@ -545,3 +545,22 @@ func (p *StConect) Test() bool {
 
 	return true
 }
+
+/*ValidTable : valida si la tabla a buscar existe*/
+func (p *StConect) ValidTable(table string) bool {
+	prueba := StQuery{
+		Querie: TESTTABLE[p.Conexion.Tipo],
+		Args: map[string]interface{}{
+			"TABLENAME": table,
+		},
+	}
+	dato, err := p.Query(prueba, 1, false)
+	if err != nil || len(dato) <= 0 {
+		return false
+	}
+	num, erraux := dato[0].ToInt("REG")
+	if num <= 0 || erraux != nil {
+		return false
+	}
+	return true
+}
