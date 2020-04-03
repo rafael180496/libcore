@@ -75,12 +75,5 @@ func DesencripAES(key string, text string) (string, error) {
 
 /*GenToken : Genera un token dependiendo de un string.*/
 func GenToken(str string) string {
-	var token string
-	temp := time.Now()
-	for i := 0; i < len(str); i++ {
-		token += CharRand()
-	}
-	token += string(temp.Second())
-
-	return GeneredHashSha256(token)
+	return GeneredHashSha256(StrRand(len(str)) + string(time.Now().Second()))
 }

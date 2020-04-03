@@ -65,6 +65,18 @@ func ReturnIf(a bool, b, c interface{}) interface{} {
 	return c
 }
 
+/*StrRand : genera una cadena de caracteres ramdon*/
+func StrRand(cant int) string {
+	if cant <= 0 {
+		cant = 1
+	}
+	str := ""
+	for i := 0; i < cant; i++ {
+		str += CharRand()
+	}
+	return str
+}
+
 /*CharRand : Genera una letra aleatoria.*/
 func CharRand() string {
 	ramdom.Seed(time.Now().UnixNano())
