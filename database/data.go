@@ -28,6 +28,23 @@ type (
 	StData map[string]interface{}
 )
 
+/*ToJSON : Convierte un  StSQLData a utl.JSON*/
+func (p *StSQLData) ToJSON() utl.JSON {
+	var data utl.JSON
+	data = p.Data
+	return data
+}
+
+/*ToMap : Convierte un StSQLData a map interface*/
+func (p *StSQLData) ToMap() ([]map[string]interface{}, error) {
+	return utl.JSONtoObj(p.ToJSON())
+}
+
+/*Unmarshal : captura una structura*/
+func (p *StSQLData) Unmarshal(v interface{}) error {
+	return json.Unmarshal(p.Data, v)
+}
+
 /*Filter : Excluye key de un map interface*/
 func (p *StData) Filter(keys ...string) StData {
 	datanew := make(StData)
