@@ -173,7 +173,7 @@ func sqldinamic(data DataTable, acc string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if !validDuplid(cols) {
+	if !utl.ValidDuplidArrayStr(cols) {
 		return "", utl.Msj.GetError("DT05")
 	}
 	if utl.InStr(acc, "u", "d") && data.LenIndex() <= 0 {
@@ -252,16 +252,4 @@ func sqlinsert(table string, cols []string) string {
 		}
 	}
 	return sqltmp
-}
-
-/*validDuplid : valida si las columnas estan duplicadas*/
-func validDuplid(cols []string) bool {
-	for i, col := range cols {
-		for j, colaux := range cols {
-			if i != j && colaux == col {
-				return false
-			}
-		}
-	}
-	return true
 }

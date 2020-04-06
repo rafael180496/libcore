@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/go-ini/ini"
 	"github.com/jmoiron/sqlx"
@@ -193,11 +192,6 @@ func (p *StConect) ConfigINI(PathINI string) error {
 	return nil
 }
 
-/*TranSQL : procesa los prefijos que le toca a cada tipo de base de datos.*/
-func (p *StConect) TranSQL(SQL string) string {
-	return strings.ToLower(strings.Replace(SQL, PrefixG, Prefijos[p.Conexion.Tipo], -1))
-}
-
 /*ToString : Muestra la estructura  StCadConect*/
 func (p *StCadConect) ToString() string {
 	return fmt.Sprintf(FORMATTOSTRCONECT, p.Clave, p.Host, p.Nombre, p.Puerto, p.Sslmode, p.Tipo, p.Usuario, p.File)
@@ -263,84 +257,72 @@ func (p *StConect) Con() error {
 
 /*Insert : Inserta a cualquier tabla donde esta conectado devuelve true si fue guardado o false si no guardo nada.*/
 func (p *StConect) Insert(Data []StQuery) error {
-	_, err := p.Exec(Data, INSERT)
-	if err != nil {
-		return err
-	}
-	return nil
+	return p.ExecValid(Data, INSERT)
 }
 
 /*UpdateOrDelete : actualiza e elimina a cualquier tabla donde esta conectado devuelve la cantidad de filas afectadas.*/
 func (p *StConect) UpdateOrDelete(Data []StQuery) (int64, error) {
-	rels, err := p.Exec(Data, DELETE)
+	err := p.ExecValid(Data, DELETE)
 	if err != nil {
 		return 0, err
 	}
-	filasCont, _ := rels.RowsAffected()
-	return filasCont, nil
+	return 0, nil
 }
 
-/*Exec : Ejecuta una accion en la conexion de base de datos es la funcion base para las funciones InsertQuery  UpdateOrDeleteQuery. */
-func (p *StConect) Exec(Data []StQuery, tipDB string) (sql.Result, error) {
-	var (
-		err    error
-		result sql.Result
-	)
+/*Exec :Ejecuta una accion de base de datos nativa con rollback*/
+func (p *StConect) Exec(Data []StQuery, indConect bool) error {
+	return p.execAux(Data, "", false, indConect, true)
+}
 
-	FinChan := make(chan bool)
-	defer close(FinChan)
-	go func() {
-		err = p.Con()
-		if err != nil {
-			err = utl.Msj.GetError("CN14")
-			FinChan <- true
-			return
-		}
-		tx := p.DBGO.MustBegin()
+/*ExecValid :Ejecuta una accion de base de datos nativa con rollback y validacion de insert e delete o que tipo de accion es */
+func (p *StConect) ExecValid(Data []StQuery, tipacc string) error {
+	return p.execAux(Data, tipacc, true, false, false)
+}
 
-		for _, dat := range Data {
-			err = validTipDB(dat.Querie, tipDB)
+/*execAux : Ejecuta una accion de base de datos  auxiliar*/
+func (p *StConect) execAux(Data []StQuery, tipACC string, indvalid, indConect, indError bool) error {
+	if len(Data) <= 0 {
+		return utl.Msj.GetError("CN22")
+	}
+	err := p.Con()
+	if err != nil {
+		return err
+	}
+	//Bloque de ejecucion
+	tx := p.DBGO.MustBegin()
+	for _, dat := range Data {
+		if indvalid {
+			err = validTipDB(dat.Querie, tipACC)
 			if err != nil {
 				p.Close()
 				tx.Rollback()
-				FinChan <- true
-				return
-			}
-			result, err = tx.NamedExec(dat.Querie, dat.Args)
-			if err != nil {
-
-				p.Close()
-				tx.Rollback()
-				FinChan <- true
-				return
+				return err
 			}
 		}
-		err = tx.Commit()
+		_, err = tx.NamedExec(dat.Querie, dat.Args)
 		if err != nil {
 			p.Close()
 			tx.Rollback()
-			err = utl.Msj.GetError("CN17")
-			FinChan <- true
-			return
-		}
-		p.Close()
-		FinChan <- true
-		return
-	}()
-
-	for {
-		select {
-		default:
-			continue
-		case <-FinChan:
-			if err != nil {
-				return result, err
+			if !indError {
+				err = utl.Msj.GetError("CN23")
 			}
-
-			return result, nil
+			return err
 		}
 	}
-
+	err = tx.Commit()
+	if err != nil {
+		p.Close()
+		tx.Rollback()
+		if !indError {
+			err = utl.Msj.GetError("CN17")
+		}
+		return err
+	}
+	//Fin de bloque
+	if !indConect {
+		p.Close()
+	}
+	return nil
 }
 
 /*QueryStruct : Ejecuta un query en la base de datos y
@@ -354,49 +336,23 @@ func (p *StConect) QueryStruct(datadest interface{}, query StQuery, indConect bo
 		args    []interface{}
 		sqltemp string
 	)
-
-	FinChan := make(chan bool)
-	defer close(FinChan)
-	go func() {
-
-		err = p.Con()
-		if err != nil {
-			err = utl.Msj.GetError("CN14")
-			FinChan <- true
-			return
-		}
-		sqltemp, args, err = p.NamedIn(query)
-		if err != nil {
-			FinChan <- true
-			return
-		}
-		err = p.DBGO.Select(datadest, sqltemp, args...)
-		if err != nil {
-			p.Close()
-			FinChan <- true
-			return
-		}
-		if !indConect {
-			p.Close()
-		}
-		FinChan <- true
-		return
-	}()
-	for {
-		select {
-		default:
-			continue
-		case <-FinChan:
-
-			if err != nil {
-
-				return err
-			}
-
-			return nil
-		}
+	err = p.Con()
+	if err != nil {
+		return err
 	}
-
+	sqltemp, args, err = p.NamedIn(query)
+	if err != nil {
+		return err
+	}
+	err = p.DBGO.Select(datadest, sqltemp, args...)
+	if err != nil {
+		p.Close()
+		return err
+	}
+	if !indConect {
+		p.Close()
+	}
+	return nil
 }
 
 /*QueryRows : Ejecuta un query en la base de datos y
@@ -410,53 +366,23 @@ func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) 
 		sqltemp string
 		args    []interface{}
 	)
-
-	FinChan := make(chan bool)
-	defer close(FinChan)
-	go func() {
-
-		err = p.Con()
-		if err != nil {
-			err = utl.Msj.GetError("CN14")
-			FinChan <- true
-			return
-		}
-		sqltemp, args, err = p.NamedIn(query)
-		if err != nil {
-			err = utl.Msj.GetError("CN07")
-			FinChan <- true
-			return
-		}
-
-		filas, err = p.DBGO.Queryx(sqltemp, args...)
-		if err != nil {
-			p.Close()
-			FinChan <- true
-			return
-		}
-		if !indConect {
-			p.Close()
-		}
-
-		FinChan <- true
-		return
-	}()
-
-	for {
-		select {
-		default:
-			continue
-		case <-FinChan:
-
-			if err != nil {
-
-				return nil, err
-			}
-
-			return filas, nil
-		}
+	err = p.Con()
+	if err != nil {
+		return filas, err
 	}
-
+	sqltemp, args, err = p.NamedIn(query)
+	if err != nil {
+		return filas, err
+	}
+	filas, err = p.DBGO.Queryx(sqltemp, args...)
+	if err != nil {
+		p.Close()
+		return filas, err
+	}
+	if !indConect {
+		p.Close()
+	}
+	return filas, nil
 }
 
 /*Query : Ejecuta un querie en la base de datos y
@@ -477,55 +403,28 @@ func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, 
 	if cantrow == 0 {
 		return nil, utl.Msj.GetError("CN15")
 	}
-
-	FinChan := make(chan bool)
-	defer close(FinChan)
-	go func() {
-
-		err = p.Con()
-		if err != nil {
-			FinChan <- true
-			return
-		}
-		sqltemp, args, err = p.NamedIn(query)
-		filas, err = p.DBGO.Queryx(sqltemp, args...)
-		if err != nil {
-			p.Close()
-			FinChan <- true
-			return
-		}
-		result, err = scanData(filas, cantrow)
-		if err != nil {
-			p.Close()
-			filas.Close()
-			err = utl.Msj.GetError("CN16")
-			FinChan <- true
-			return
-		}
-
-		if !indConect {
-			p.Close()
-		}
-		filas.Close()
-		FinChan <- true
-		return
-	}()
-
-	for {
-		select {
-		default:
-			continue
-		case <-FinChan:
-
-			if err != nil {
-
-				return nil, err
-			}
-
-			return result, nil
-		}
+	err = p.Con()
+	if err != nil {
+		return result, err
 	}
-
+	sqltemp, args, err = p.NamedIn(query)
+	filas, err = p.DBGO.Queryx(sqltemp, args...)
+	if err != nil {
+		p.Close()
+		return result, err
+	}
+	result, err = scanData(filas, cantrow)
+	if err != nil {
+		p.Close()
+		filas.Close()
+		err = utl.Msj.GetError("CN16")
+		return result, err
+	}
+	if !indConect {
+		p.Close()
+	}
+	filas.Close()
+	return result, nil
 }
 
 /*Test : Valida si se puede conectar ala base de datos antes de un  uso.*/

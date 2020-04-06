@@ -12,9 +12,7 @@ type DatePostgreSQL struct {
 
 /*UnmarshalJSON : fomateo especial a json para los tipo Time en golang*/
 func (sd *DatePostgreSQL) UnmarshalJSON(input []byte) error {
-	strInput := string(input)
-	strInput = strings.Trim(strInput, `"`)
-	newTime, err := time.Parse(FormatFechaPostgresql, strInput)
+	newTime, err := time.Parse(FormatFechaPostgresql, strings.Trim(string(input), `"`))
 	if err != nil {
 		return err
 	}

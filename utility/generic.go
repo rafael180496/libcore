@@ -10,6 +10,18 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+/*ValidDuplidArrayStr : valida un arreglo de string si estan duplicados*/
+func ValidDuplidArrayStr(strs []string) bool {
+	for i, str := range strs {
+		for j, straux := range strs {
+			if i != j && straux == str {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 /*InStr : compara  varios string con uno especifico*/
 func InStr(str string, strs ...string) bool {
 	for _, item := range strs {
@@ -116,8 +128,5 @@ func IsSpace(str string) bool {
 /*GeneredUUID : Genera un codigo uuid unico */
 func GeneredUUID() string {
 	var err error
-	u1 := uuid.Must(uuid.NewV4(), err)
-	uuid := fmt.Sprintf("%s", u1)
-
-	return uuid
+	return fmt.Sprintf("%s", uuid.Must(uuid.NewV4(), err))
 }
