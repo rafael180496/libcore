@@ -30,6 +30,8 @@ var (
 	Msj = StMsj{
 		Store: map[string]string{
 			"GE01": "Mensaje no encontrado.",
+			"GE02": "Error al convertir fecha",
+			"GE03": "Error al convertir la data a map",
 			//libreria encrip
 			"EN01": "Error en generar phisher.",
 			"EN02": "Error en generar bloque.",

@@ -2,10 +2,9 @@ package utility
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"net/url"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +12,31 @@ import (
 
 /*Float64XML : tipo que repara el error de los xml en los millones*/
 type Float64XML float64
+
+func jsonStringToObject(s string, v interface{}) error {
+	data := []byte(s)
+	return json.Unmarshal(data, v)
+}
+
+/*ToMapInterface : convierte cualquier data en map [string]interface{}*/
+func ToMapInterface(i interface{}) (map[string]interface{}, error) {
+	var m = map[string]interface{}{}
+
+	switch v := i.(type) {
+	case map[interface{}]interface{}:
+		for k, val := range v {
+			m[ToString(k)] = val
+		}
+		return m, nil
+	case map[string]interface{}:
+		return v, nil
+	case string:
+		err := jsonStringToObject(v, &m)
+		return m, err
+	default:
+		return m, Msj.GetError("GE03")
+	}
+}
 
 /*MarshalXMLAttr : tramforma el xml*/
 func (f Float64XML) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
@@ -128,54 +152,41 @@ func IntToStr(val int) string {
 	return strconv.FormatInt(int64(val), 10)
 }
 
-/*MapKeys : Conviert un map a interface o datos dinamicos.*/
-func MapKeys(data *map[interface{}]interface{}) []interface{} {
-
-	keys := make([]interface{}, len(*data))
-	i := 0
-	for key := range *data {
-		keys[i] = key
-		i++
-	}
-	return keys
+/*StringToDate : convierte un string a un time */
+func StringToDate(s string) (time.Time, error) {
+	return parsedate(s, []string{
+		time.RFC3339,
+		"2006-01-02T15:04:05",
+		time.RFC1123Z,
+		time.RFC1123,
+		time.RFC822Z,
+		time.RFC822,
+		time.RFC850,
+		time.ANSIC,
+		time.UnixDate,
+		time.RubyDate,
+		"2006-01-02 15:04:05.999999999 -0700 MST",
+		"2006-01-02",
+		"02 Jan 2006",
+		"2006-01-02T15:04:05-0700",
+		"2006-01-02 15:04:05 -07:00",
+		"2006-01-02 15:04:05 -0700",
+		"2006-01-02 15:04:05Z07:00",
+		"2006-01-02 15:04:05Z0700",
+		"2006-01-02 15:04:05",
+		time.Kitchen,
+		time.Stamp,
+		time.StampMilli,
+		time.StampMicro,
+		time.StampNano,
+	})
 }
 
-/*MapStrKeys : Convierte un map a arreglo de string*/
-func MapStrKeys(data *map[string]interface{}) []string {
-
-	keys := make([]string, len(*data))
-	i := 0
-	for key := range *data {
-		keys[i] = key
-		i++
-	}
-	return keys
-
-}
-
-/*StructToMap : Convierte un struct a map[string] */
-func StructToMap(i interface{}) (valores url.Values) {
-	valores = url.Values{}
-	atributo := reflect.ValueOf(i).Elem()
-	tipo := atributo.Type()
-	for i := 0; i < atributo.NumField(); i++ {
-		f := atributo.Field(i)
-		var v string
-		switch f.Interface().(type) {
-		case int, int8, int16, int32, int64:
-			v = strconv.FormatInt(f.Int(), 10)
-		case uint, uint8, uint16, uint32, uint64:
-			v = strconv.FormatUint(f.Uint(), 10)
-		case float32:
-			v = strconv.FormatFloat(f.Float(), 'f', 4, 32)
-		case float64:
-			v = strconv.FormatFloat(f.Float(), 'f', 4, 64)
-		case []byte:
-			v = string(f.Bytes())
-		case string:
-			v = f.String()
+func parsedate(s string, dates []string) (d time.Time, e error) {
+	for _, dateType := range dates {
+		if d, e = time.Parse(dateType, s); e == nil {
+			return
 		}
-		valores.Set(tipo.Field(i).Name, v)
 	}
-	return
+	return d, Msj.GetError("GE02")
 }
