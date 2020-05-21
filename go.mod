@@ -15,4 +15,6 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
 	gopkg.in/rana/ora.v4 v4.1.15
+	github.com/labstack/echo/v4 v4.1.16
+	github.com/mssola/user_agent v0.5.2
 )
