@@ -209,27 +209,6 @@ func (p *StCadConect) ValidCad() bool {
 	return true
 }
 
-/*strURL : Arma la cadena de conexion dependiendo del tipo*/
-func strURL(tipo string, conexion StCadConect) (string, string) {
-	switch tipo {
-	case Ora:
-		/*Open("ora", "user/passw@host:port/sid")*/
-		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
-	case Post:
-		/*"postgres://user:password@localhost:port/bdnamme?sslmode=verify-full"*/
-		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre, conexion.Sslmode)
-	case Mysql:
-		/*sql.Open("mssql", "user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true") */
-		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
-	case Sqlser:
-		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Host, conexion.Usuario, conexion.Clave, conexion.Puerto, conexion.Nombre)
-	case SQLLite:
-		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.File)
-	default:
-		return "", ""
-	}
-}
-
 /*Con : Crear una conexion ala base de datos configurada en la cadena.*/
 func (p *StConect) Con() error {
 	var (
@@ -385,6 +364,38 @@ func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) 
 	return filas, nil
 }
 
+/*QueryJSON : Ejecuta un querie en la base de datos y
+  devuelve un json dinamico para mostrar los datos donde le limitan la cantida
+	de registro que debe de devolver
+	indConect = true deja la conexion abierta
+	indLimit = true limite de fila si esta en false desactiva esta opcion
+*/
+func (p *StConect) QueryJSON(query StQuery, cantrow int, indConect, indLimit bool) ([]byte, error) {
+	result, err := p.queryGeneric(query, cantrow, indConect, indLimit)
+	if err != nil {
+		return nil, err
+	}
+	JSON, errJSON := json.Marshal(&result)
+	if errJSON != nil {
+		return nil, errJSON
+	}
+	return JSON, nil
+}
+
+/*QueryMap : Ejecuta un querie en la base de datos y
+  devuelve un map dinamico para mostrar los datos donde le limitan la cantida
+	de registro que debe de devolver
+	indConect = true deja la conexion abierta
+	indLimit = true limite de fila si esta en false desactiva esta opcion
+*/
+func (p *StConect) QueryMap(query StQuery, cantrow int, indConect, indLimit bool) ([]StData, error) {
+	result, err := p.queryGeneric(query, cantrow, indConect, indLimit)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 /*Query : Ejecuta un querie en la base de datos y
   devuelve un map dinamico para mostrar los datos donde le limitan la cantida
 	de registro que debe de devolver
@@ -393,6 +404,14 @@ func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) 
   map[COD_CLI:50364481 NIS_RAD:5355046 SEC_NIS:1]
 */
 func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, error) {
+	if cantrow <= 0 {
+		return nil, utl.Msj.GetError("CN15")
+	}
+	return p.queryGeneric(query, cantrow, indConect, true)
+}
+
+/*queryGeneric : ejecuta sql dinamicos regresando un map*/
+func (p *StConect) queryGeneric(query StQuery, cantrow int, indConect, indLimit bool) ([]StData, error) {
 	var (
 		err     error
 		filas   *sqlx.Rows
@@ -400,9 +419,6 @@ func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, 
 		args    []interface{}
 		sqltemp string
 	)
-	if cantrow == 0 {
-		return nil, utl.Msj.GetError("CN15")
-	}
 	err = p.Con()
 	if err != nil {
 		return result, err
@@ -413,7 +429,7 @@ func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, 
 		p.Close()
 		return result, err
 	}
-	result, err = scanData(filas, cantrow)
+	result, err = scanData(filas, cantrow, true)
 	if err != nil {
 		p.Close()
 		filas.Close()
@@ -437,7 +453,7 @@ func (p *StConect) Test() bool {
 	case Ora:
 		prueba.Querie = `SELECT 1 FROM DUAL`
 	}
-	dato, err := p.Query(*prueba, 1, false)
+	dato, err := p.QueryMap(*prueba, 1, false, true)
 	if err != nil || len(dato) <= 0 {
 		return false
 	}
@@ -453,7 +469,7 @@ func (p *StConect) ValidTable(table string) bool {
 			"TABLENAME": table,
 		},
 	}
-	dato, err := p.Query(prueba, 1, false)
+	dato, err := p.QueryMap(prueba, 1, false, true)
 	if err != nil || len(dato) <= 0 {
 		return false
 	}

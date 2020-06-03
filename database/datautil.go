@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -14,6 +15,27 @@ func envTableData(tableData []map[string]interface{}, datachan chan utl.JSON, er
 		errchan <- err
 	} else {
 		datachan <- d
+	}
+}
+
+/*strURL : Arma la cadena de conexion dependiendo del tipo*/
+func strURL(tipo string, conexion StCadConect) (string, string) {
+	switch tipo {
+	case Ora:
+		/*Open("ora", "user/passw@host:port/sid")*/
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
+	case Post:
+		/*"postgres://user:password@localhost:port/bdnamme?sslmode=verify-full"*/
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre, conexion.Sslmode)
+	case Mysql:
+		/*sql.Open("mssql", "user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true") */
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
+	case Sqlser:
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Host, conexion.Usuario, conexion.Clave, conexion.Puerto, conexion.Nombre)
+	case SQLLite:
+		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.File)
+	default:
+		return "", ""
 	}
 }
 
@@ -65,12 +87,12 @@ func sendData(valores []interface{}, columnas []string) StData {
 }
 
 /*scanData : escanea las fila regresando un tipo generico */
-func scanData(rows *sqlx.Rows, cantrow int) ([]StData, error) {
+func scanData(rows *sqlx.Rows, maxRows int, indLimit bool) ([]StData, error) {
 	var (
-		result   []StData
-		columnas []string
-		err      error
-		controws = 0
+		result    []StData
+		columnas  []string
+		err       error
+		countRows = 0
 	)
 	columnas, err = rows.Columns()
 	if err != nil {
@@ -82,11 +104,11 @@ func scanData(rows *sqlx.Rows, cantrow int) ([]StData, error) {
 		ptrData[i] = &valores[i]
 	}
 	for rows.Next() {
-		if cantrow > 0 {
-			if controws > cantrow || cantrow == 0 {
+		if maxRows > 0 || indLimit == true {
+			if countRows > maxRows {
 				break
 			}
-			controws++
+			countRows++
 		}
 		err = rows.Scan(ptrData...)
 		if err != nil {
