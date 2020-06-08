@@ -2,6 +2,7 @@ package utility
 
 import (
 	"fmt"
+	"math/rand"
 	ramdom "math/rand"
 	"strings"
 	"time"
@@ -77,21 +78,26 @@ func ReturnIf(a bool, b, c interface{}) interface{} {
 }
 
 /*StrRand : genera una cadena de caracteres ramdon*/
-func StrRand(cant int) string {
+func StrRand(cant int, Upper bool) string {
 	if cant <= 0 {
 		cant = 1
 	}
 	str := ""
 	for i := 0; i < cant; i++ {
-		str += CharRand()
+		str += CharRand(Upper)
 	}
 	return str
 }
 
-/*CharRand : Genera una letra aleatoria.*/
-func CharRand() string {
+/*CharRand : Genera una letra aleatoria upper indica si queres mayusculas o miniscula.*/
+func CharRand(Upper bool) string {
+	return ReturnIf(Upper, string(byte(RandInt(65, 90))), string(byte(RandInt(97, 122)))).(string)
+}
+
+/*RandInt : envia un numero aleatorio*/
+func RandInt(min, max int) int {
 	ramdom.Seed(time.Now().UnixNano())
-	return string(ramdom.Intn(122) + 97)
+	return min + rand.Intn(max-min)
 }
 
 /*SubString : substring para un string en golang con runas*/
