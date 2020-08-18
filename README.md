@@ -82,19 +82,19 @@ funcione correctamente el proyecto.**
 
 **Funciones:**
 
-~~~~go
+```go
 /*Cierre : cierra las conexiones de base de datos intanciadas*/
 func (p *StConexion) Cierre() error {}
-~~~~
+```
 
 **Estructura:**
 
-~~~~go
+```go
 /*StCadConexion : Estructura para generar la cadena de  conexiones de base de datos */
 type StCadConexion struct {
     Nombre `json:"nombre"`
 }
-~~~~
+```
 
 **Constante:**
 

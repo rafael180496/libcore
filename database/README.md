@@ -87,6 +87,16 @@ go get -u -v gopkg.in/rana/ora.v4
 * 64-bit MinGW-64 instalado:[mingw-w64]([https://sourceforge.net/projects/mingw-w64/]).
 * Versión de GIT para Windows
 
+### **Lista de Client Oracle**
+
+* [Oracle client]([https://www.oracle.com/database/technologies/instant-client/winx64-64-downloads.html]).
+* Instant Client Package - Basic
+* Instant Client Package - JDBC Supplement
+* Instant Client Package - SQL*Plus
+* Instant Client Package - SDK
+* Instant Client Package - ODBC
+* Instant Client Package - WRC
+
 ### **Configuración de pkg-config**
 
 Crear la carpeta  **C:\pkg-config** y descomprime en su interior los siguientes archivos:
