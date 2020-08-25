@@ -1,6 +1,24 @@
 package database
 
+type (
+	/*TpCore : Enums de tipos de datos para los sql e validacion*/
+	TpCore string
+)
+
 const (
+	/*Tp tipos tp*/
+
+	/*INTP : tipo core entero*/
+	INTP TpCore = "int"
+	/*STTP : tipo core texto*/
+	STTP TpCore = "string"
+	/*FLTP : tipo core numerico*/
+	FLTP TpCore = "numeric"
+	/*BLTP : tipo core condicional*/
+	BLTP TpCore = "bool"
+	/*DTTP : tipo core date*/
+	DTTP TpCore = "date"
+
 	/*SQLLite : conexion tipo sqllite
 	https://github.com/mattn/go-sqlite3
 	*/

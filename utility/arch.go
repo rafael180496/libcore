@@ -107,16 +107,14 @@ func NewStLog(dir, name, prefix string, fe time.Time) (StLog, error) {
 
 /*FileExt : Valida las extenciones de archivos.*/
 func FileExt(Path string, ext string) bool {
-	result := strings.Index(Path, EXT[ext])
-	if result > 0 {
-		return true
+	if !FileExist(Path, false) {
+		return false
 	}
-	return false
+	return ReturnIf(strings.Index(Path, EXT[ext]) > 0, true, false).(bool)
 }
 
 /*FileRename : Renombra a un archivo como tambien lo puede mover a otro directorio de manera nativa.*/
 func FileRename(PathOrigen, PathNuevo string) error {
-
 	err := os.Rename(PathOrigen, PathNuevo)
 	if err != nil {
 		return err
@@ -166,7 +164,6 @@ func TrimFile(Path string) (string, error) {
 
 /*DirNew : Crea una carpeta vacia en el sistema*/
 func DirNew(Path string) error {
-
 	err := os.MkdirAll(plecaAdd(Path), os.ModePerm)
 	if err != nil {
 		return Msj.GetError("AR02")

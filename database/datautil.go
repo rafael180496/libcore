@@ -94,6 +94,7 @@ func scanData(rows *sqlx.Rows, maxRows int, indLimit bool) ([]StData, error) {
 		err       error
 		countRows = 0
 	)
+	maxRows = utl.ReturnIf(maxRows <= 0, 1, maxRows).(int)
 	columnas, err = rows.Columns()
 	if err != nil {
 		return result, utl.Msj.GetError("CN06")
@@ -104,7 +105,7 @@ func scanData(rows *sqlx.Rows, maxRows int, indLimit bool) ([]StData, error) {
 		ptrData[i] = &valores[i]
 	}
 	for rows.Next() {
-		if maxRows > 0 || indLimit == true {
+		if indLimit == true {
 			if countRows > maxRows {
 				break
 			}

@@ -203,14 +203,8 @@ func upperMap(data StData) StData {
 	return datanew
 }
 func sqldelete(table string, indices []string) string {
-	sqltmp := fmt.Sprintf("DELETE FROM  %s WHERE ", table)
-	for i, item := range indices {
-		if i == (len(indices) - 1) {
-			sqltmp = fmt.Sprintf("%s %s = :%s", sqltmp, item, item)
-		} else {
-			sqltmp = fmt.Sprintf("%s %s = :%s AND", sqltmp, item, item)
-		}
-	}
+	sqltmp := fmt.Sprintf("DELETE FROM  %s", table)
+	sqltmp = sqlConditional(sqltmp, indices)
 	return sqltmp
 }
 
@@ -219,22 +213,22 @@ func sqlupdate(table string, cols []string, indices []string) string {
 	values := utl.FilterExcl(cols, indices)
 
 	for i, item := range values {
-		if i == (len(values) - 1) {
-			sqltmp = fmt.Sprintf("%s %s = :%s", sqltmp, item, item)
-		} else {
-			sqltmp = fmt.Sprintf("%s %s = :%s ,", sqltmp, item, item)
-		}
+		ind := (len(values) - 1)
+		sqltmp = fmt.Sprintf("%s %s = :%s%s", sqltmp, item, item, utl.ReturnIf(i == ind, "", " ,").(string))
 	}
+	sqltmp = sqlConditional(sqltmp, indices)
+	return sqltmp
+}
+
+func sqlConditional(sqltmp string, indices []string) string {
 	sqltmp = fmt.Sprintf("%s WHERE ", sqltmp)
 	for i, item := range indices {
-		if i == (len(indices) - 1) {
-			sqltmp = fmt.Sprintf("%s %s = :%s", sqltmp, item, item)
-		} else {
-			sqltmp = fmt.Sprintf("%s %s = :%s AND", sqltmp, item, item)
-		}
+		ind := (len(indices) - 1)
+		sqltmp = fmt.Sprintf("%s %s = :%s%s", sqltmp, item, item, utl.ReturnIf(i == ind, "", " AND").(string))
 	}
 	return sqltmp
 }
+
 func sqlinsert(table string, cols []string) string {
 	sqltmp := fmt.Sprintf("INSERT INTO %s (", table)
 	for i, item := range cols {
@@ -245,11 +239,8 @@ func sqlinsert(table string, cols []string) string {
 		}
 	}
 	for i, item := range cols {
-		if i == (len(cols) - 1) {
-			sqltmp = fmt.Sprintf("%s:%s)", sqltmp, item)
-		} else {
-			sqltmp = fmt.Sprintf("%s:%s,", sqltmp, item)
-		}
+		ind := (len(cols) - 1)
+		sqltmp = fmt.Sprintf("%s:%s%s", sqltmp, item, utl.ReturnIf(i == ind, ")", ",").(string))
 	}
 	return sqltmp
 }

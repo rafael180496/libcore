@@ -85,7 +85,6 @@ func (p *StEmailAdmin) AddBody(content, header, body string) {
 
 /*ArmarEmail : arma el correo en general html o  texto plano*/
 func (p *StEmailAdmin) ArmarEmail() string {
-
 	header := make(map[string]string)
 	header["From"] = p.User.Email
 	receipient := ""

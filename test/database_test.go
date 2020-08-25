@@ -20,6 +20,7 @@ func TestDataTable(t *testing.T) {
 		"campo3": 6,
 	})
 	data.AddIndex("campo1")
+	data.AddIndex("campo2")
 	rowi, _ := data.GenInserts()
 	fmt.Printf("%v", rowi)
 	rowu, _ := data.GenUpdates()

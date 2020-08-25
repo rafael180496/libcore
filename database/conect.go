@@ -25,14 +25,14 @@ import (
 type (
 	/*StCadConect : Estructura para generar la cadena de  conexiones de base de datos */
 	StCadConect struct {
-		File    string `json:"filedb"`
-		Usuario string `json:"usuario"`
-		Clave   string `json:"clave"`
-		Nombre  string `json:"nombre"`
-		Tipo    string `json:"tipo"`
-		Host    string `json:"host"`
-		Puerto  int    `json:"puerto"`
-		Sslmode string `json:"sslmode"`
+		File    string `json:"filedb"  ini:"filedb"`
+		Usuario string `json:"usuario" ini:"usuario"`
+		Clave   string `json:"clave"   ini:"clave"`
+		Nombre  string `json:"nombre"  ini:"nombre"`
+		Tipo    string `json:"tipo"    ini:"tipo"`
+		Host    string `json:"host"    ini:"host"`
+		Puerto  int    `json:"puerto"  ini:"puerto"`
+		Sslmode string `json:"sslmode" ini:"sslmode"`
 	}
 	/*StConect : Estructura que contiene la conexion a x tipo de base de datos.*/
 	StConect struct {
@@ -114,7 +114,7 @@ func (p *StConect) ConfigJSON(PathJSON string) error {
 		cad     StCadConect
 		ptrArch *os.File
 	)
-	if !utl.FileExist(PathJSON, false) || !utl.FileExt(PathJSON, "JSON") {
+	if !utl.FileExt(PathJSON, "JSON") {
 		return utl.Msj.GetError("CN09")
 	}
 	PathJSON, err = utl.TrimFile(PathJSON)
@@ -165,26 +165,14 @@ func (p *StConect) ConfigINI(PathINI string) error {
 	var (
 		cad StCadConect
 	)
-	if !utl.FileExist(PathINI, false) || !utl.FileExt(PathINI, "INI") {
+	if !utl.FileExt(PathINI, "INI") {
 		return utl.Msj.GetError("CN10")
 	}
-
-	iniArch, err := ini.Load(PathINI)
+	cfg, err := ini.Load(PathINI)
 	if err != nil {
 		return utl.Msj.GetError("CN11")
 	}
-	cad.Usuario = iniArch.Section("database").Key("usuario").String()
-	cad.Clave = iniArch.Section("database").Key("clave").String()
-	cad.Nombre = iniArch.Section("database").Key("nombre").String()
-	cad.Tipo = iniArch.Section("database").Key("tipo").String()
-	cad.File = iniArch.Section("database").Key("filedb").String()
-	cad.Puerto, err = iniArch.Section("database").Key("puerto").Int()
-	if err != nil {
-		cad.Puerto = 0
-	}
-	cad.Host = iniArch.Section("database").Key("host").String()
-	/*opcional configuracion temporal*/
-	cad.Sslmode = iniArch.Section("database").Key("sslmode").String()
+	cfg.Section("database").MapTo(&cad)
 	if !cad.ValidCad() {
 		return utl.Msj.GetError("CN12")
 	}
@@ -429,7 +417,7 @@ func (p *StConect) queryGeneric(query StQuery, cantrow int, indConect, indLimit 
 		p.Close()
 		return result, err
 	}
-	result, err = scanData(filas, cantrow, true)
+	result, err = scanData(filas, cantrow, indLimit)
 	if err != nil {
 		p.Close()
 		filas.Close()
@@ -445,7 +433,6 @@ func (p *StConect) queryGeneric(query StQuery, cantrow int, indConect, indLimit 
 
 /*Test : Valida si se puede conectar ala base de datos antes de un  uso.*/
 func (p *StConect) Test() bool {
-
 	prueba := new(StQuery)
 	switch p.Conexion.Tipo {
 	case Post, Mysql, Sqlser, SQLLite:
@@ -457,7 +444,6 @@ func (p *StConect) Test() bool {
 	if err != nil || len(dato) <= 0 {
 		return false
 	}
-
 	return true
 }
 

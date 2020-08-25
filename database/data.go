@@ -23,7 +23,6 @@ type (
 		Querie string `json:"querie"`
 		Args   map[string]interface{}
 	}
-
 	/*StData : Estructura que extrae los datos de una consulta de base de datos tramformandola en map*/
 	StData map[string]interface{}
 )
@@ -59,12 +58,35 @@ func (p *StData) Filter(keys ...string) StData {
 
 /*ValidColum : valida si un campo existe*/
 func (p *StData) ValidColum(col string) bool {
-	for _, item := range p.KeyColum() {
-		if item == col {
-			return true
-		}
+	clone := *p
+	_, ok := clone[col]
+	return ok
+}
+
+/*FindTp : busca el tipo de datos para las tablas con constante prederminadas
+INTP : tipo core entero
+STTP : tipo core texto
+FLTP : tipo core numerico
+BLTP : tipo core condicional
+DTTP : tipo core date
+*/
+func FindTp(v interface{}, tp TpCore) interface{} {
+	switch tp {
+	case INTP:
+		return utl.ToInt(v)
+	case STTP:
+		return utl.ToString(v)
+	case DTTP:
+		vl := utl.ToString(v)
+		date, err := utl.StringToDate(vl)
+		return utl.ReturnIf(err != nil, utl.FNulo(), date)
+	case FLTP:
+		return utl.ToFloat(v)
+	case BLTP:
+		return utl.ToBoolean(v)
+	default:
+		return nil
 	}
-	return false
 }
 
 /*KeyColum : envia las columnas que contiene la data*/

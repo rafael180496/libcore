@@ -9,14 +9,18 @@ import (
 	color "github.com/fatih/color"
 )
 
+/*MaxCPUtaskLimit : maxima cantidad de core a usar  con limitaciones TASKCORE es el limite*/
+func MaxCPUtaskLimit(TASKCORE int) int {
+	TASKCORE = ReturnIf(TASKCORE <= 0, 1, TASKCORE).(int)
+	core := MaxCPUtask()
+	return ReturnIf(TASKCORE > core, core, TASKCORE).(int)
+}
+
 /*MaxCPUtask : maxima multi hilos que puede obtener   */
 func MaxCPUtask() int {
 	maxProcs := runtime.GOMAXPROCS(0)
 	numCPU := runtime.NumCPU()
-	if maxProcs < numCPU {
-		return maxProcs
-	}
-	return numCPU
+	return ReturnIf(maxProcs < numCPU, maxProcs, numCPU).(int)
 }
 
 /*NumProcSet : setea los numeros de proceso validos */
@@ -56,7 +60,6 @@ func PrintPc(c Pc, format string, arg ...interface{}) {
 	} else {
 		d := color.New(sendColor(c), color.Bold)
 		d.Printf(format, arg...)
-
 	}
 }
 
@@ -165,15 +168,33 @@ func GetLocalIPV4() string {
 	return ""
 }
 
+/*IsMac : Valida si estas en un sistema operativo Imac */
+func IsMac() bool {
+	return IsSO("darwin")
+}
+
+/*IsWindows : Valida si estas en un sistema operativo windows */
+func IsWindows() bool {
+	return IsSO("windows")
+}
+
 /*IsLinux : Valida si estas en un sistema operativo linux */
 func IsLinux() bool {
-	switch runtime.GOOS {
-	case "windows":
-		return false
+	return IsSO("linux")
+}
 
-	case "linux", "darwin":
-		return true
-	default:
-		return false
-	}
+/*IsSO : valida en que sistema operativo estas lista:
+android,
+darwin,
+dragonfly,
+linux,
+freebsd,
+openbsd,
+solaris,
+netbsd,
+plan9,
+windows
+*/
+func IsSO(so string) bool {
+	return ReturnIf(runtime.GOOS == so, true, false).(bool)
 }
