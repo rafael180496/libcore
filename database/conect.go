@@ -172,7 +172,10 @@ func (p *StConect) ConfigINI(PathINI string) error {
 	if err != nil {
 		return utl.Msj.GetError("CN11")
 	}
-	cfg.Section("database").MapTo(&cad)
+	err = cfg.Section("database").MapTo(&cad)
+	if err != nil {
+		return err
+	}
 	if !cad.ValidCad() {
 		return utl.Msj.GetError("CN12")
 	}
