@@ -48,4 +48,10 @@ const (
 	PUT HTTPTip = "PUT"
 	/*DELETE : peticion http DELETE*/
 	DELETE HTTPTip = "DELETE"
+	/*Tipos de protocolos : http https */
+
+	/*HTTP : protocolo http*/
+	HTTP = "http"
+	/*HTTPS : protocolo https*/
+	HTTPS = "https"
 )
