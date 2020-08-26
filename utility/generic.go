@@ -22,6 +22,26 @@ func ValidDuplidArrayStr(strs []string) bool {
 	}
 	return true
 }
+func accStr(str, acc string) string {
+	return ReturnIf("u" == acc, strings.ToUpper(acc), strings.ToLower(str)).(string)
+}
+func accStrs(acc string, strs ...string) []string {
+	var strsNew []string
+	for _, str := range strs {
+		strsNew = append(strsNew, accStr(str, acc))
+	}
+	return strsNew
+}
+
+/*UpperStrs : coloca en mayusculas un arreglo compleot de strings*/
+func UpperStrs(strs ...string) []string {
+	return accStrs("u", strs...)
+}
+
+/*LowerStrs : coloca en minusculas un arreglo compleot de strings*/
+func LowerStrs(strs ...string) []string {
+	return accStrs("l", strs...)
+}
 
 /*InStr : compara  varios string con uno especifico*/
 func InStr(str string, strs ...string) bool {
