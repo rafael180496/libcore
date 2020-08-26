@@ -66,13 +66,11 @@ var (
 			"CN14": "Error al conectar ala DB.",
 			"CN15": "Cantidad de fila es cero.",
 			"CN16": "Error al cerrar ala DB.",
-			"CN17": "Error en commit.",
 			"CN18": "Error en al ejecutar querie.",
 			"CN19": "Error en al obtener columna.",
 			"CN20": "El db es sqllite necesita el archivo.db",
 			"CN21": "La URL no es valida o le falta parametros",
 			"CN22": "Cantiadad de acciones menor o igual a ceros",
-			"CN23": "Error al actulizar o eliminar registro",
 			//libreria json
 			"JS01": "Error al generar un nuevo json.",
 			"JS02": "Error al convertir un json.",
@@ -92,6 +90,7 @@ var (
 			"DT04": "No tienen columnas cargada.",
 			"DT05": "Columna duplicada.",
 			"DT06": "No tiene ningun indice asignado",
+			"DT07": "Accion invalida datatable",
 		},
 	}
 	/*EXT : extensiones de archivos */

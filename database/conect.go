@@ -239,18 +239,31 @@ func (p *StConect) UpdateOrDelete(Data []StQuery) (int64, error) {
 	return 0, nil
 }
 
+/*ExecDatatable : ejecuta a nivel de base de datos una accione datable esta puede ser INSERT,DELETE,UPDATE*/
+func (p *StConect) ExecDatatable(data DataTable, acc string, indConect bool) error {
+	queries, err := data.GenSQL(acc)
+	if err != nil {
+		return err
+	}
+	err = p.Exec(queries, indConect)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 /*Exec :Ejecuta una accion de base de datos nativa con rollback*/
 func (p *StConect) Exec(Data []StQuery, indConect bool) error {
-	return p.execAux(Data, "", false, indConect, true)
+	return p.execAux(Data, "", false, indConect)
 }
 
 /*ExecValid :Ejecuta una accion de base de datos nativa con rollback y validacion de insert e delete o que tipo de accion es */
 func (p *StConect) ExecValid(Data []StQuery, tipacc string) error {
-	return p.execAux(Data, tipacc, true, false, false)
+	return p.execAux(Data, tipacc, true, false)
 }
 
 /*execAux : Ejecuta una accion de base de datos  auxiliar*/
-func (p *StConect) execAux(Data []StQuery, tipACC string, indvalid, indConect, indError bool) error {
+func (p *StConect) execAux(Data []StQuery, tipACC string, indvalid, indConect bool) error {
 	if len(Data) <= 0 {
 		return utl.Msj.GetError("CN22")
 	}
@@ -273,9 +286,6 @@ func (p *StConect) execAux(Data []StQuery, tipACC string, indvalid, indConect, i
 		if err != nil {
 			p.Close()
 			tx.Rollback()
-			if !indError {
-				err = utl.Msj.GetError("CN23")
-			}
 			return err
 		}
 	}
@@ -283,12 +293,8 @@ func (p *StConect) execAux(Data []StQuery, tipACC string, indvalid, indConect, i
 	if err != nil {
 		p.Close()
 		tx.Rollback()
-		if !indError {
-			err = utl.Msj.GetError("CN17")
-		}
 		return err
 	}
-	//Fin de bloque
 	if !indConect {
 		p.Close()
 	}

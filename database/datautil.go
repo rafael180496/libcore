@@ -44,7 +44,7 @@ func validTipDB(sqlOrig string, tipo string) error {
 	var (
 		valid bool
 	)
-	sqlOrig = strings.ToLower(sqlOrig)
+	sqlOrig = strings.ToUpper(sqlOrig)
 
 	switch tipo {
 	case INSERT:

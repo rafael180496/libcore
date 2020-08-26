@@ -110,11 +110,25 @@ func (p *DataTable) GetRows() []StData {
 	return p.rows
 }
 
+/*GenSQL : genera acciones de base de datos mediante los siguientes comando INSERT,UPDATE,DELETE*/
+func (p *DataTable) GenSQL(accion string) ([]StQuery, error) {
+	switch accion {
+	case INSERT:
+		return p.GenInserts()
+	case DELETE:
+		return p.GenDeletes()
+	case UPDATE:
+		return p.GenUpdates()
+	default:
+		return nil, utl.Msj.GetError("DT07")
+	}
+}
+
 /*GenInserts : genera insert masivos para modificaciones de base de datos*/
 func (p *DataTable) GenInserts() ([]StQuery, error) {
 	var queries []StQuery
 	clone := *p
-	sqltemp, err := sqldinamic(clone, "i")
+	sqltemp, err := sqldinamic(clone, INSERT)
 	if err != nil {
 		return queries, err
 	}
@@ -131,7 +145,7 @@ func (p *DataTable) GenInserts() ([]StQuery, error) {
 func (p *DataTable) GenDeletes() ([]StQuery, error) {
 	var queries []StQuery
 	clone := *p
-	sqltemp, err := sqldinamic(clone, "d")
+	sqltemp, err := sqldinamic(clone, DELETE)
 	if err != nil {
 		return queries, err
 	}
@@ -150,7 +164,7 @@ func (p *DataTable) GenDeletes() ([]StQuery, error) {
 func (p *DataTable) GenUpdates() ([]StQuery, error) {
 	var queries []StQuery
 	clone := *p
-	sqltemp, err := sqldinamic(clone, "u")
+	sqltemp, err := sqldinamic(clone, UPDATE)
 	if err != nil {
 		return queries, err
 	}
@@ -176,17 +190,17 @@ func sqldinamic(data DataTable, acc string) (string, error) {
 	if !utl.ValidDuplidArrayStr(cols) {
 		return "", utl.Msj.GetError("DT05")
 	}
-	if utl.InStr(acc, "u", "d") && data.LenIndex() <= 0 {
+	if utl.InStr(acc, UPDATE, DELETE) && data.LenIndex() <= 0 {
 		return "", utl.Msj.GetError("DT06")
 	}
 	switch acc {
-	case "i":
+	case INSERT:
 		sqltmp := sqlinsert(table, cols)
 		return sqltmp, nil
-	case "u":
+	case UPDATE:
 		sqltmp := sqlupdate(table, cols, data.GetIndex())
 		return sqltmp, nil
-	case "d":
+	case DELETE:
 		sqltmp := sqldelete(table, data.GetIndex())
 		return sqltmp, nil
 	default:

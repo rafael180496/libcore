@@ -42,15 +42,15 @@ const (
 	/*PrefixG : prefijo general para los parametros en las consultas ejemplo : :val1 oracle ? post  */
 	PrefixG = ":n"
 	/*INSERT : prefijo de insert */
-	INSERT = "insert"
+	INSERT = "INSERT"
 	/*UPDATE : prefijo de UPDATE */
-	UPDATE = "update"
+	UPDATE = "UPDATE"
 	/*DELETE : prefijo de DELETE */
-	DELETE = "delete"
+	DELETE = "DELETE"
 	/*SELECT : prefijo de select*/
-	SELECT = "select"
+	SELECT = "SELECT"
 	/*FROM : prefijo de tablas */
-	FROM = "from"
+	FROM = "FROM"
 )
 
 var (
