@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	utl "github.com/rafael180496/libcore/utility"
 )
@@ -87,6 +88,17 @@ func FindTp(v interface{}, tp TpCore) interface{} {
 	default:
 		return nil
 	}
+}
+
+/*UpperKey : coloca en mayusculas todas las keys*/
+func (p *StData) UpperKey() StData {
+	datanew := make(StData)
+	data := *p
+	for k := range data {
+		kNew := strings.ToUpper(k)
+		datanew[kNew] = data[k]
+	}
+	return datanew
 }
 
 /*KeyColum : envia las columnas que contiene la data*/

@@ -80,7 +80,7 @@ func (p *DataTable) AddRows(rows ...StData) {
 
 /*AddRow : Agrega una fila */
 func (p *DataTable) AddRow(row StData) {
-	p.rows = append(p.rows, upperMap(row))
+	p.rows = append(p.rows, row.UpperKey())
 }
 
 /*AddIndex : agrega una llave para los delete o update*/
@@ -207,14 +207,6 @@ func sqldinamic(data DataTable, acc string) (string, error) {
 		return "", nil
 
 	}
-}
-func upperMap(data StData) StData {
-	datanew := make(StData)
-	for k := range data {
-		kNew := strings.ToUpper(k)
-		datanew[kNew] = data[k]
-	}
-	return datanew
 }
 func sqldelete(table string, indices []string) string {
 	sqltmp := fmt.Sprintf("DELETE FROM  %s", table)
