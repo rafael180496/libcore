@@ -45,6 +45,13 @@ func (p *StSQLData) Unmarshal(v interface{}) error {
 	return json.Unmarshal(p.Data, v)
 }
 
+/*NewStData : crea un Stdata de un map*/
+func NewStData(mp map[string]interface{}) StData {
+	var data StData
+	data = mp
+	return data
+}
+
 /*Filter : Excluye key de un map interface*/
 func (p *StData) Filter(keys ...string) StData {
 	datanew := make(StData)
