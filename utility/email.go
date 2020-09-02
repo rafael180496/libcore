@@ -6,44 +6,40 @@ import (
 	"mime/quotedprintable"
 	"net/smtp"
 	"strings"
-
-	"github.com/asaskevich/govalidator"
 )
 
 type (
 	/*StEmailAdmin : Estructura principal para envio de correro */
 	StEmailAdmin struct {
-		User  StAuthEmail `json:"user" valid:"-"`
-		Dest  []string    `json:"dest" valid:"-"`
-		Email StEmail     `json:"email" valid:"-"`
+		User  StAuthEmail `json:"user"`
+		Dest  []string    `json:"dest"`
+		Email StEmail     `json:"email"`
 	}
 
 	/*StAuthEmail  : credenciales para enviar correo */
 	StAuthEmail struct {
-		Email string `json:"email" valid:"email,required"`
-		Pass  string `json:"pass" valid:"required,length(1|500)"`
-		Host  string `json:"smtp" valid:"required,length(1|500)"`
-		Port  string `json:"port" valid:"numeric,required"`
+		Email string `json:"email"`
+		Pass  string `json:"pass" `
+		Host  string `json:"smtp"`
+		Port  string `json:"port"`
 	}
 
 	/*StEmail : estructura para enviar correo  */
 	StEmail struct {
-		HeadMsg     string `json:"head" valid:"required,length(1|500)"`
-		BodyMsg     string `json:"body" valid:"required,length(1|10000)"`
-		ContentType string `json:"content" valid:"required,length(1|500)"`
+		HeadMsg     string `json:"head"`
+		BodyMsg     string `json:"body"`
+		ContentType string `json:"content"`
 	}
 )
 
 /*Validar valida una estructura  StAuthEmail*/
 func (p *StAuthEmail) Validar() bool {
-	_, err := govalidator.ValidateStruct(p)
-	return ReturnIf(err != nil, false, true).(bool)
+	return ReturnIf(!IsEmail(p.Email) || !IsNilStr(p.Pass) || !IsNilStr(p.Host) || !IsNilStr(p.Port), false, true).(bool)
 }
 
 /*Validar valida una estructura  StEmail*/
 func (p *StEmail) Validar() bool {
-	_, err := govalidator.ValidateStruct(p)
-	return ReturnIf(err != nil, false, true).(bool)
+	return ReturnIf(!IsNilStr(p.BodyMsg) || !IsNilStr(p.ContentType) || !IsNilStr(p.HeadMsg), false, true).(bool)
 }
 
 /*Validar valida una estructura  StEmailAdmin*/

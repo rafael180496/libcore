@@ -4,12 +4,60 @@ import (
 	"fmt"
 	"math/rand"
 	ramdom "math/rand"
+	"net/url"
 	"strings"
 	"time"
 	"unicode"
+	"unicode/utf8"
 
 	uuid "github.com/satori/go.uuid"
 )
+
+/*Reverse :  manda la reversa de un string */
+func Reverse(s string) string {
+	r := []rune(s)
+	for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r)
+}
+
+/*IsEmail : valida si el string es un email.*/
+func IsEmail(str string) bool {
+	return EmailFor.MatchString(str)
+}
+
+/*IsNilStr : valida si un string esta vacio*/
+func IsNilStr(str string) bool {
+	return ReturnIf(Trim(str) == "", false, true).(bool)
+}
+
+/*IsURL : valida un string si una url es valida*/
+func IsURL(str string) bool {
+	if str == "" || utf8.RuneCountInString(str) >= MaxURLRuneCount || len(str) <= MinURLRuneCount || strings.HasPrefix(str, ".") {
+		return false
+	}
+	strTemp := str
+	if strings.Contains(str, ":") && !strings.Contains(str, "://") {
+		strTemp = "http://" + str
+	}
+	u, err := url.Parse(strTemp)
+	if err != nil {
+		return false
+	}
+	if strings.HasPrefix(u.Host, ".") {
+		return false
+	}
+	if Trim(u.Host) == "" && (u.Path != "" && !strings.Contains(u.Path, ".")) {
+		return false
+	}
+	return URLFor.MatchString(str)
+}
+
+/*GetLines : consigue un arreglos por saltos de lineas en un string*/
+func GetLines(s string) []string {
+	return strings.Split(s, "\n")
+}
 
 /*ValidDuplidArrayStr : valida un arreglo de string si estan duplicados*/
 func ValidDuplidArrayStr(strs []string) bool {
@@ -31,6 +79,16 @@ func accStrs(acc string, strs ...string) []string {
 		strsNew = append(strsNew, accStr(str, acc))
 	}
 	return strsNew
+}
+
+/*IsNilArrayStr : valida si los string son vacio*/
+func IsNilArrayStr(strs ...string) bool {
+	for _, str := range strs {
+		if !IsNilStr(str) {
+			return false
+		}
+	}
+	return true
 }
 
 /*UpperStrs : coloca en mayusculas un arreglo compleot de strings*/

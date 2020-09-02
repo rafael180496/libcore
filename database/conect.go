@@ -40,8 +40,17 @@ type (
 		DBGO     *sqlx.DB
 		DBTx     *sql.Tx
 		DBStmt   *sql.Stmt
+		Queries  map[string]string
 	}
 )
+
+/*SendSQL : envia un sql con los argumentos */
+func (p *StConect) SendSQL(code string, args map[string]interface{}) StQuery {
+	return StQuery{
+		Querie: p.Queries[code],
+		Args:   args,
+	}
+}
 
 /*Close : cierra las conexiones de base de datos intanciadas*/
 func (p *StConect) Close() error {
@@ -191,10 +200,11 @@ func (p *StCadConect) ToString() string {
 /*ValidCad : valida la cadena de conexion capturada */
 func (p *StCadConect) ValidCad() bool {
 	p.Trim()
-	if p.Tipo != SQLLite && (p.Clave == "" || p.Usuario == "" || p.Nombre == "" || p.Tipo == "" || p.Host == "" || p.Puerto <= 0) {
+	if p.Tipo != SQLLite && (!utl.IsNilArrayStr(p.Clave, p.Usuario, p.Nombre, p.Tipo, p.Host) || p.Puerto <= 0) {
 		return false
 	}
-	if p.Tipo == SQLLite && p.File == "" {
+
+	if p.Tipo == SQLLite && !utl.IsNilStr(p.File) {
 		return false
 	}
 	return true
