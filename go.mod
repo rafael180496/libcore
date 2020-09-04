@@ -12,7 +12,6 @@ require (
 	github.com/lib/pq v1.8.0
 	github.com/mattn/go-sqlite3 v1.14.2
 	github.com/mssola/user_agent v0.5.2
-	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect

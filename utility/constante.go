@@ -77,6 +77,7 @@ var (
 			"CN20": "El db es sqllite necesita el archivo.db",
 			"CN21": "La URL no es valida o le falta parametros",
 			"CN22": "Cantiadad de acciones menor o igual a ceros",
+			"CN23": "Base de datos sqllite vacia",
 			//libreria json
 			"JS01": "Error al generar un nuevo json.",
 			"JS02": "Error al convertir un json.",
@@ -107,6 +108,8 @@ var (
 		"RUT":  ".rut",
 		"SQL":  ".sql",
 		"DB":   ".bd",
+		"CSV":  ".csv",
+		"TXT":  ".txt",
 	}
 )
 

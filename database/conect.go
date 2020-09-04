@@ -36,13 +36,44 @@ type (
 	}
 	/*StConect : Estructura que contiene la conexion a x tipo de base de datos.*/
 	StConect struct {
-		Conexion StCadConect
-		DBGO     *sqlx.DB
-		DBTx     *sql.Tx
-		DBStmt   *sql.Stmt
-		Queries  map[string]string
+		Conexion     StCadConect
+		DBGO         *sqlx.DB
+		DBTx         *sql.Tx
+		DBStmt       *sql.Stmt
+		backupScript string
+		Queries      map[string]string
 	}
 )
+
+/*SetBackupScript : setea un scrip backup para la creacion de base de datos en modelos go*/
+func (p *StConect) SetBackupScript(sql string) {
+	p.backupScript = sql
+}
+
+/*ExecBackup : ejecuta el querie backup */
+func (p *StConect) ExecBackup() error {
+	if len(p.backupScript) <= 0 {
+		return utl.Msj.GetError("CN22")
+	}
+	err := p.Con()
+	if err != nil {
+		return err
+	}
+	tx := p.DBGO.MustBegin()
+	_, err = tx.Exec(p.backupScript)
+	if err != nil {
+		p.Close()
+		tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	if err != nil {
+		p.Close()
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
 
 /*SendSQL : envia un sql con los argumentos */
 func (p *StConect) SendSQL(code string, args map[string]interface{}) StQuery {
@@ -224,7 +255,7 @@ func (p *StConect) Con() error {
 		errping = p.DBGO.Ping()
 	}
 	if errping != nil || p.DBGO == nil {
-		if (p.Conexion.Tipo == SQLLite) && (!utl.FileExist(conexion.File, false)) {
+		if p.Conexion.Tipo == SQLLite && p.createDB() != nil {
 			return utl.Msj.GetError("CN20")
 		}
 		p.DBGO, err = sqlx.Connect(prefijo, cadena)
@@ -233,6 +264,18 @@ func (p *StConect) Con() error {
 		}
 	}
 	return nil
+}
+
+/*funcion para crear base de datos sqllite*/
+func (p *StConect) createDB() error {
+	if utl.FileExt(p.Conexion.File, "DB") {
+		return nil
+	}
+	_, err := utl.FileNew(p.Conexion.File)
+	if err != nil {
+		return err
+	}
+	return utl.Msj.GetError("CN23")
 }
 
 /*Insert : Inserta a cualquier tabla donde esta conectado devuelve true si fue guardado o false si no guardo nada.*/
