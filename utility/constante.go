@@ -107,7 +107,7 @@ var (
 		"XML":  ".xml",
 		"RUT":  ".rut",
 		"SQL":  ".sql",
-		"DB":   ".bd",
+		"DB":   ".db",
 		"CSV":  ".csv",
 		"TXT":  ".txt",
 	}
