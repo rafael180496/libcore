@@ -37,6 +37,7 @@ type (
 	/*StConect : Estructura que contiene la conexion a x tipo de base de datos.*/
 	StConect struct {
 		Conexion     StCadConect
+		urlNative    string
 		DBGO         *sqlx.DB
 		DBTx         *sql.Tx
 		DBStmt       *sql.Stmt
@@ -128,6 +129,11 @@ func (p *StCadConect) Trim() {
 		p.Sslmode = Ssmodes[0]
 	}
 
+}
+
+/*ConfigURL : captura una conexion nativa de drive para base de datos*/
+func (p *StConect) ConfigURL(url string) {
+	p.urlNative = url
 }
 
 /*ConfigJSON : Lee las configuraciones de conexion mediante un .json
@@ -223,6 +229,41 @@ func (p *StConect) ConfigINI(PathINI string) error {
 	return nil
 }
 
+/*ConfigENV : lee las configuracion de la base de datos mediante variables de entorno
+Ejemplo:
+ENV USUARIO = prueba
+ENV CLAVE = prueba
+ENV NOMBRE  = prueba
+ENV TIPO = POST
+ENV PUERTO = 5433
+ENV HOST = Localhost
+ENV SSLMODE = opcional
+ENV  FILEDB = opcional sqllite
+*/
+func (p *StConect) ConfigENV() error {
+	var (
+		cad StCadConect
+	)
+	cad.Clave = os.Getenv("CLAVE")
+	cad.Usuario = os.Getenv("USUARIO")
+	cad.Nombre = os.Getenv("NOMBRE")
+	cad.Tipo = os.Getenv("TIPO")
+	cad.Puerto = utl.ToInt(os.Getenv("TIPO"))
+	cad.Host = os.Getenv("HOST")
+	cad.Sslmode = os.Getenv("SSLMODE")
+	cad.File = os.Getenv("FILEDB")
+	if !cad.ValidCad() {
+		return utl.Msj.GetError("CN12")
+	}
+	p.Conexion = cad
+	return nil
+}
+
+/*ResetCnx : Limpia la cadena de conexion*/
+func (p *StConect) ResetCnx() {
+	p.Conexion = StCadConect{}
+}
+
 /*ToString : Muestra la estructura  StCadConect*/
 func (p *StCadConect) ToString() string {
 	return fmt.Sprintf(FORMATTOSTRCONECT, p.Clave, p.Host, p.Nombre, p.Puerto, p.Sslmode, p.Tipo, p.Usuario, p.File)
@@ -234,7 +275,6 @@ func (p *StCadConect) ValidCad() bool {
 	if p.Tipo != SQLLite && (!utl.IsNilArrayStr(p.Clave, p.Usuario, p.Nombre, p.Tipo, p.Host) || p.Puerto <= 0) {
 		return false
 	}
-
 	if p.Tipo == SQLLite && !utl.IsNilStr(p.File) {
 		return false
 	}
@@ -248,6 +288,7 @@ func (p *StConect) Con() error {
 	)
 	conexion := p.Conexion
 	prefijo, cadena := strURL(p.Conexion.Tipo, conexion)
+	cadena = utl.ReturnIf(!utl.IsNilStr(p.urlNative), cadena, p.urlNative).(string)
 	if cadena == "" {
 		return utl.Msj.GetError("CN13")
 	}
