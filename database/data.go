@@ -92,6 +92,9 @@ func FindTp(v interface{}, tp TpCore) interface{} {
 		return utl.ToFloat(v)
 	case BLTP:
 		return utl.ToBoolean(v)
+	case JSONTP:
+		data, _ := utl.NewJSON(v)
+		return data
 	default:
 		return nil
 	}

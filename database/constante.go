@@ -18,6 +18,8 @@ const (
 	BLTP TpCore = "bool"
 	/*DTTP : tipo core date*/
 	DTTP TpCore = "date"
+	/*JSONTP : tipo core json*/
+	JSONTP TpCore = "json"
 
 	/*SQLLite : conexion tipo sqllite
 	https://github.com/mattn/go-sqlite3
