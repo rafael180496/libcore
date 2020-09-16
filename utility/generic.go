@@ -157,9 +157,7 @@ func ReturnIf(a bool, b, c interface{}) interface{} {
 
 /*StrRand : genera una cadena de caracteres ramdon*/
 func StrRand(cant int, Upper bool) string {
-	if cant <= 0 {
-		cant = 1
-	}
+	cant = ReturnIf(cant <= 0, 1, cant).(int)
 	str := ""
 	for i := 0; i < cant; i++ {
 		str += CharRand(Upper)
@@ -188,7 +186,6 @@ func SubString(cadena string, ini, cant int) string {
 func Trim(str string) string {
 	return strings.Map(func(r rune) rune {
 		if unicode.IsSpace(r) {
-
 			return -1
 		}
 		return r

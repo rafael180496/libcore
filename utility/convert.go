@@ -55,14 +55,12 @@ func TimetoStr(dia time.Time) string {
 
 /*StrtoByte : Convierte un string a array byte */
 func StrtoByte(str string) []byte {
-
 	return []byte(str)
 }
 
 /*BytetoStrHex : Convierte un   array byte a string */
 func BytetoStrHex(str []byte) string {
-	strByte := hex.EncodeToString(str)
-	return strByte
+	return hex.EncodeToString(str)
 }
 
 /*SliceStrToStr : convierte un array de strings a un string con separador */
@@ -91,9 +89,7 @@ func BytetoStr(str []byte) string {
 
 /*RoundFloat64 : redondea un  */
 func RoundFloat64(valor float64, dec int) float64 {
-	if dec <= 0 {
-		dec = 1
-	}
+	dec = ReturnIf(dec <= 0, 1, dec).(int)
 	format := fmt.Sprintf(".%df", dec)
 	format = "%" + format
 	valstr := fmt.Sprintf(format, valor)

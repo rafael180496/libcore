@@ -164,7 +164,7 @@ func TrimFile(Path string) (string, error) {
 
 /*DirNew : Crea una carpeta vacia en el sistema*/
 func DirNew(Path string) error {
-	err := os.MkdirAll(plecaAdd(Path), os.ModePerm)
+	err := os.MkdirAll(PlecaAdd(Path), os.ModePerm)
 	if err != nil {
 		return Msj.GetError("AR02")
 	}
@@ -174,7 +174,7 @@ func DirNew(Path string) error {
 /*CpFile : copia un archivo Origen a un directorio destino*/
 func CpFile(PathOrig, PathDest string) error {
 	fileNew := new(os.File)
-	PathDest = plecaAdd(PathDest)
+	PathDest = PlecaAdd(PathDest)
 	if !FileExist(PathOrig, false) {
 		return Msj.GetError("AR01")
 	}
@@ -208,8 +208,8 @@ func CpFile(PathOrig, PathDest string) error {
 
 /*CpDir : copia una carpeta entera a una carpeta destino*/
 func CpDir(PathOrig, PathDest string) error {
-	PathOrig = plecaAdd(PathOrig)
-	PathDest = plecaAdd(PathDest)
+	PathOrig = PlecaAdd(PathOrig)
+	PathDest = PlecaAdd(PathDest)
 	if !FileExist(PathOrig, true) {
 		return Msj.GetError("AR05")
 	}
@@ -241,7 +241,7 @@ func CpDir(PathOrig, PathDest string) error {
 
 /*RmDir : Elimina un directorio entero*/
 func RmDir(src string) error {
-	src = plecaAdd(src)
+	src = PlecaAdd(src)
 	if !FileExist(src, true) {
 		return Msj.GetError("AR05")
 	}
@@ -285,7 +285,7 @@ func RmFile(file string) error {
 
 /*ListDir : lista la infomacion que contiene una carpeta*/
 func ListDir(src string) ([]os.FileInfo, error) {
-	src = plecaAdd(src)
+	src = PlecaAdd(src)
 	if !FileExist(src, true) {
 		return nil, Msj.GetError("AR05")
 	}
@@ -296,8 +296,8 @@ func ListDir(src string) ([]os.FileInfo, error) {
 	return files, nil
 }
 
-/*plecaAdd : coloca la pleca de un directorio*/
-func plecaAdd(src string) string {
+/*PlecaAdd : coloca la pleca de un directorio "/" */
+func PlecaAdd(src string) string {
 	if src[len(src)-1] != '/' {
 		src = src + "/"
 	}
