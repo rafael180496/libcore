@@ -3,6 +3,19 @@ package server
 import echo "github.com/labstack/echo/v4"
 
 type (
+	/*ConfigServer : configuraciones del servicio generales */
+	ConfigServer struct {
+		/*Ipser : sirve para cuando este en modo produccion coloque la ip asignada al server*/
+		Ipser string `ini:"ipser"`
+		/*Debug : modo debug para el proyecto*/
+		Debug bool `ini:"debug"`
+		/*Local : habilita el modo local del servicio*/
+		Local bool `ini:"local"`
+		/*Puerto : Coloca el puerto del servicio*/
+		Puerto int `ini:"puerto"`
+		/*Protocol : protocolo del servicio*/
+		Protocol string `ini:"protocol"`
+	}
 	/*StInfoPet : envia la informacion general de la peticion */
 	StInfoPet struct {
 		URL    string `json:"url"`

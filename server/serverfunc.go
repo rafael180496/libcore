@@ -1,9 +1,11 @@
 package server
 
 import (
+	"fmt"
 	"strings"
 
 	utl "github.com/rafael180496/libcore/utility"
+	"gopkg.in/ini.v1"
 
 	echo "github.com/labstack/echo/v4"
 	agent "github.com/mssola/user_agent"
@@ -138,4 +140,42 @@ func findpet(e *echo.Echo, p HTTPPet) error {
 /*ExtKey : extrae el key de la sesion en el api */
 func ExtKey(c echo.Context) string {
 	return strings.Replace(c.Request().Header.Get("Authorization"), "Bearer ", "", -1)
+}
+
+/*LoadIni : leer el archivo de configuracion del servicio esta debe ser [server]*/
+func (p *ConfigServer) LoadIni(path string) error {
+	var Config ConfigServer
+	cfg, erraux := ini.Load(path)
+	if erraux != nil {
+		return erraux
+	}
+	err := cfg.Section("server").MapTo(&Config)
+	if err != nil {
+		return err
+	}
+	*p = Config
+	return p.Valid()
+}
+
+/*Valid : valida la estructa y la configura para el servicio*/
+func (p *ConfigServer) Valid() error {
+	p.Ipser = utl.Trim(p.Ipser)
+	if p.Ipser == "" {
+		p.Ipser = utl.GetLocalIPV4()
+	}
+	if p.Local {
+		p.Ipser = "localhost"
+	}
+	if p.Puerto <= 0 {
+		return fmt.Errorf("%s", "Puerto no valido.")
+	}
+	if !utl.InStr(p.Protocol, HTTP, HTTPS) {
+		p.Protocol = HTTP
+	}
+	return nil
+}
+
+/*Host : envia el host del servicio*/
+func (p *ConfigServer) Host() string {
+	return fmt.Sprintf("%s://%s:%d", p.Protocol, p.Ipser, p.Puerto)
 }
