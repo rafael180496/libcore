@@ -9,11 +9,11 @@ const (
 	/*Tp tipos tp*/
 
 	/*INTP : tipo core entero*/
-	INTP TpCore = "int"
+	INTP TpCore = "integer"
 	/*STTP : tipo core texto*/
 	STTP TpCore = "string"
 	/*FLTP : tipo core numerico*/
-	FLTP TpCore = "numeric"
+	FLTP TpCore = "number"
 	/*BLTP : tipo core condicional*/
 	BLTP TpCore = "bool"
 	/*DTTP : tipo core date*/
