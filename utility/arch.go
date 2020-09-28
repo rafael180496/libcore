@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -11,9 +12,7 @@ import (
 
 type (
 	/*StArchMa : estructura maestra que crea directorios o archivos masivos.*/
-	StArchMa struct {
-		Archs []StArch
-	}
+	StArchMa []StArch
 	/*StArch : estructura para registra los archivos y generarlos.*/
 	StArch struct {
 		Path   string
@@ -36,7 +35,7 @@ type (
 
 /*Create : crear el archivo o directorio vacio si existe no lo crea */
 func (p *StArchMa) Create() error {
-	for _, item := range p.Archs {
+	for _, item := range *p {
 		err := item.Create()
 		if err != nil {
 			return nil
@@ -73,9 +72,7 @@ func (p *StLog) Printf(format string, args ...interface{}) error {
 
 /*Init : Inicializa el log para comenzarlo a usar */
 func (p *StLog) Init() error {
-	FechaText := TimetoStr(p.Fe)
-	NameArch := strings.Replace(p.Dir+"/"+p.Name+FechaText+".log", " ", "", -1)
-
+	NameArch := fmt.Sprintf("%s/%s%s.log", Trim(p.Dir), Trim(p.Name), Trim(TimetoStr(p.Fe)))
 	if !FileExist(p.Dir, true) {
 		return Msj.GetError("AR05")
 	}
