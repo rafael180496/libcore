@@ -15,7 +15,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
-	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208 // indirect
+	golang.org/x/sync v0.0.0-20200930132711-30421366ff76 // indirect
 	gopkg.in/ini.v1 v1.61.0
 	gopkg.in/rana/ora.v4 v4.1.15
 )
