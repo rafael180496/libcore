@@ -24,12 +24,6 @@ func TestTrim(t *testing.T) {
 	t.Logf("trim:[%s]", utl.Trim(text))
 }
 
-/*TestUUID : Genera una clave unica*/
-func TestUUID(t *testing.T) {
-	text := utl.GeneredUUID()
-	t.Logf("text:[%s]", text)
-}
-
 /*TestFloat64 : Redondea un valor float a x decimales*/
 func TestFloat64(t *testing.T) {
 	valor := 12.34661

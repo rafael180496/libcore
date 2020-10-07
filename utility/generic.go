@@ -1,7 +1,6 @@
 package utility
 
 import (
-	"fmt"
 	"math/rand"
 	ramdom "math/rand"
 	"net/url"
@@ -9,8 +8,6 @@ import (
 	"time"
 	"unicode"
 	"unicode/utf8"
-
-	uuid "github.com/satori/go.uuid"
 )
 
 /*Reverse :  manda la reversa de un string */
@@ -203,10 +200,4 @@ func IsSpace(str string) bool {
 		return r
 	}, str)
 	return rest
-}
-
-/*GeneredUUID : Genera un codigo uuid unico */
-func GeneredUUID() string {
-	var err error
-	return fmt.Sprintf("%s", uuid.Must(uuid.NewV4(), err))
 }

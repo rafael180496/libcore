@@ -77,3 +77,13 @@ func DesencripAES(key string, text string) (string, error) {
 func GenToken(str string) string {
 	return GeneredHashSha256(StrRand(len(str), false) + string(time.Now().Second()))
 }
+
+/*GeneredUUID : Genera un codigo uuid unico */
+func GeneredUUID() string {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		return ""
+	}
+	return fmt.Sprintf("%X-%X-%X-%X-%X", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+}

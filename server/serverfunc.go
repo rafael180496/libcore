@@ -8,7 +8,6 @@ import (
 	"gopkg.in/ini.v1"
 
 	echo "github.com/labstack/echo/v4"
-	agent "github.com/mssola/user_agent"
 )
 
 /*InfPetKey : captura la informacion de una peticion y un token valido*/
@@ -57,13 +56,12 @@ func FindInfoReq(c echo.Context) (StInfoReq, error) {
 	var (
 		info StInfoReq
 	)
-	ua := agent.New(c.Request().UserAgent())
+	ua := New(c.Request().UserAgent())
 	info.UserAgent = c.Request().UserAgent()
 	info.HostOrig = c.Scheme() + "://" + c.Request().Host
-	nombrebrow, versionbrow := ua.Browser()
 	info.IPRemote = c.RealIP()
-	info.Browser = nombrebrow + " " + versionbrow
-	info.SystemOI = ua.OS()
+	info.Browser = fmt.Sprintf("%s %s", ua.Browser.Name, ua.Browser.Version)
+	info.SystemOI = ua.OS
 	return info, nil
 }
 
