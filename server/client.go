@@ -1,0 +1,77 @@
+package server
+
+import (
+	"bytes"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+)
+
+/*AddQueryParameters : agrega los parametros para un param querie*/
+func AddQueryParameters(baseURL string, queryParams map[string]string) string {
+	baseURL += "?"
+	params := url.Values{}
+	for key, value := range queryParams {
+		params.Add(key, value)
+	}
+	return baseURL + params.Encode()
+}
+
+/*BuildRequestObject : Contruccion de objeto http*/
+func BuildRequestObject(request Request) (*http.Request, error) {
+	if len(request.QueryParams) != 0 {
+		request.BaseURL = AddQueryParameters(request.BaseURL, request.QueryParams)
+	}
+	req, err := http.NewRequest(string(request.Method), request.BaseURL, bytes.NewBuffer(request.Body))
+	if err != nil {
+		return req, err
+	}
+	for key, value := range request.Headers {
+		req.Header.Set(key, value)
+	}
+	_, exists := req.Header["Content-Type"]
+	if len(request.Body) > 0 && !exists {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	return req, err
+}
+
+/*MakeRequest :  obtiene la respuesta de una peticion*/
+func MakeRequest(req *http.Request) (*http.Response, error) {
+	return DefaultClient.HTTPClient.Do(req)
+}
+
+/*BuildResponse : construccion de una respuesta*/
+func BuildResponse(res *http.Response) (*Response, error) {
+	body, err := ioutil.ReadAll(res.Body)
+	defer res.Body.Close()
+	response := Response{
+		StatusCode: res.StatusCode,
+		Body:       string(body),
+		Headers:    res.Header,
+	}
+	return &response, err
+}
+
+/*Send : envia una peticion a un servicio*/
+func Send(request Request) (*Response, error) {
+	return DefaultClient.Send(request)
+}
+
+/*MakeRequest : envia la peticion de un servicio con un cliente por defecto*/
+func (c *Client) MakeRequest(req *http.Request) (*http.Response, error) {
+	return c.HTTPClient.Do(req)
+}
+
+/*Send : envia una peticion a un servicio y regresa la respuesta*/
+func (c *Client) Send(request Request) (*Response, error) {
+	req, err := BuildRequestObject(request)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.MakeRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	return BuildResponse(res)
+}

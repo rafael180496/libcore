@@ -1,12 +1,35 @@
 package server
 
 import (
+	"net/http"
 	"regexp"
 
 	echo "github.com/labstack/echo/v4"
 )
 
 type (
+	/*Request : estructara para tener los datos del servicio*/
+	Request struct {
+		Method      HTTPTip
+		BaseURL     string
+		Headers     map[string]string
+		QueryParams map[string]string
+		Body        []byte
+	}
+	/*Response : estructura para cargar la respuesta del servidor*/
+	Response struct {
+		StatusCode int
+		Body       string
+		Headers    map[string][]string
+	}
+	/*RestError : Obtiene una respuesta incorrecta al lado del servidor*/
+	RestError struct {
+		Response *Response
+	}
+	/*Client : cliente http*/
+	Client struct {
+		HTTPClient *http.Client
+	}
 	/*section : contiene la informacion general del servicio*/
 	section struct {
 		name    string
@@ -80,6 +103,8 @@ type (
 )
 
 var (
+	/*DefaultClient : cliente http con parametros default*/
+	DefaultClient     = &Client{HTTPClient: &http.Client{}}
 	ie11Regexp        = regexp.MustCompile("^rv:(.+)$")
 	botRegex          = regexp.MustCompile("(?i)(bot|crawler|sp(i|y)der|search|worm|fetch|nutch)")
 	botFromSiteRegexp = regexp.MustCompile("http[s]?://.+\\.\\w+")
