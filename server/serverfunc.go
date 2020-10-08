@@ -203,7 +203,7 @@ func (p *ConfigServer) PathCert() string {
 
 /*StarServer : inicia el servicio echo .*/
 func (p *ConfigServer) StarServer(e *echo.Echo) {
-	if p.DirSSL == HTTPS {
+	if p.Protocol == HTTPS {
 		e.Logger.Fatal(e.StartTLS(":"+utl.IntToStr(p.Puerto), p.PathCert(), p.PathKey()))
 	} else {
 		e.Logger.Fatal(e.Start(":" + utl.IntToStr(p.Puerto)))
