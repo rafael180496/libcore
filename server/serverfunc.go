@@ -142,7 +142,7 @@ func ExtKey(c echo.Context) string {
 
 /*LoadIni : leer el archivo de configuracion del servicio esta debe ser [server]*/
 func (p *ConfigServer) LoadIni(path string) error {
-	var Config ConfigServer
+	Config := *p
 	cfg, erraux := ini.Load(path)
 	if erraux != nil {
 		return erraux
