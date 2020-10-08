@@ -171,15 +171,15 @@ func (p *ConfigServer) Valid() error {
 		p.Protocol = HTTP
 	}
 	if p.Protocol == HTTPS {
-		if utl.FileExist(p.DirSSL, true) {
+		if !utl.FileExist(p.DirSSL, true) {
 			return fmt.Errorf("%s", "Directorio SSL no existe.")
 		}
 		pathcert := utl.PlecaAdd(p.DirSSL) + p.CertFile
-		if utl.FileExist(pathcert, false) {
+		if !utl.FileExist(pathcert, false) {
 			return fmt.Errorf("%s", "Archivo del certificado no existe.")
 		}
 		pathkey := utl.PlecaAdd(p.DirSSL) + p.KeyFile
-		if utl.FileExist(pathkey, false) {
+		if !utl.FileExist(pathkey, false) {
 			return fmt.Errorf("%s", "Archivo de la llave no existe.")
 		}
 	}
