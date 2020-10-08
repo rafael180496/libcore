@@ -190,3 +190,22 @@ func (p *ConfigServer) Valid() error {
 func (p *ConfigServer) Host() string {
 	return fmt.Sprintf("%s://%s:%d", p.Protocol, p.Ipser, p.Puerto)
 }
+
+/*PathKey : recupera el path de la llave*/
+func (p *ConfigServer) PathKey() string {
+	return utl.PlecaAdd(p.DirSSL) + p.KeyFile
+}
+
+/*PathCert : recupera el path del certificado*/
+func (p *ConfigServer) PathCert() string {
+	return utl.PlecaAdd(p.DirSSL) + p.KeyFile
+}
+
+/*StarServer : inicia el servicio echo .*/
+func (p *ConfigServer) StarServer(e *echo.Echo) {
+	if p.DirSSL == HTTPS {
+		e.Logger.Fatal(e.StartTLS(":"+utl.IntToStr(p.Puerto), p.PathCert(), p.PathKey()))
+	} else {
+		e.Logger.Fatal(e.Start(":" + utl.IntToStr(p.Puerto)))
+	}
+}
