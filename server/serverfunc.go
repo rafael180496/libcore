@@ -198,7 +198,7 @@ func (p *ConfigServer) PathKey() string {
 
 /*PathCert : recupera el path del certificado*/
 func (p *ConfigServer) PathCert() string {
-	return utl.PlecaAdd(p.DirSSL) + p.KeyFile
+	return utl.PlecaAdd(p.DirSSL) + p.CertFile
 }
 
 /*StarServer : inicia el servicio echo .*/
