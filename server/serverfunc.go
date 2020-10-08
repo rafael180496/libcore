@@ -188,7 +188,10 @@ func (p *ConfigServer) Valid() error {
 
 /*Host : envia el host del servicio*/
 func (p *ConfigServer) Host() string {
-	return fmt.Sprintf("%s://%s:%d", p.Protocol, p.Ipser, p.Puerto)
+	if p.Local {
+		return fmt.Sprintf("%s://%s:%d", p.Protocol, p.Ipser, p.Puerto)
+	}
+	return fmt.Sprintf("%s://%s", p.Protocol, p.Ipser)
 }
 
 /*PathKey : recupera el path de la llave*/
