@@ -123,6 +123,12 @@ func FileRename(PathOrigen, PathNuevo string) error {
 Valida tambien si existe un directorio con el inddir en true
 */
 func FileExist(Path string, inddir bool) bool {
+	if !IsNilStr(Path) {
+		return false
+	}
+	if inddir {
+		Path = PlecaAdd(Path)
+	}
 	info, err := os.Stat(Path)
 	if err != nil {
 		if os.IsNotExist(err) {
