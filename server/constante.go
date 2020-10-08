@@ -67,6 +67,12 @@ type (
 		Puerto int `ini:"puerto"`
 		/*Protocol : protocolo del servicio*/
 		Protocol string `ini:"protocol"`
+		/*CertFile : certificado ssl*/
+		CertFile string `ini:"certfile"`
+		/*KeyFile : llave del certificado ssl*/
+		KeyFile string `ini:"keyfile"`
+		/*DirSSL : carpeta donde esta el certificado*/
+		DirSSL string `ini:"dirssl"`
 	}
 	/*StInfoPet : envia la informacion general de la peticion */
 	StInfoPet struct {
