@@ -356,6 +356,54 @@ func (p *StConect) ExecValid(Data []StQuery, tipacc string) error {
 	return p.execAux(Data, tipacc, true, false)
 }
 
+/*QuerieNative :  ejecuta la funcion nativa del paquete sql*/
+func (p *StConect) QuerieNative(sql string, indConect bool, args ...interface{}) error {
+	if !utl.IsNilStr(sql) {
+		return fmt.Errorf("%s", "El querie esta vacio")
+	}
+	err := p.Con()
+	if err != nil {
+		return err
+	}
+	_, err = p.DBGO.Query(sql, args...)
+	if err != nil {
+		p.Close()
+		return err
+	}
+	if !indConect {
+		p.Close()
+	}
+	return nil
+}
+
+/*ExecNative :  ejecuta la funcion nativa del paquete sql*/
+func (p *StConect) ExecNative(sql string, indConect bool, args ...interface{}) error {
+	if !utl.IsNilStr(sql) {
+		return fmt.Errorf("%s", "El querie esta vacio")
+	}
+	err := p.Con()
+	if err != nil {
+		return err
+	}
+	tx := p.DBGO.MustBegin()
+	_, err = tx.Exec(sql, args...)
+	if err != nil {
+		p.Close()
+		tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	if err != nil {
+		p.Close()
+		tx.Rollback()
+		return err
+	}
+	if !indConect {
+		p.Close()
+	}
+	return nil
+}
+
 /*execAux : Ejecuta una accion de base de datos  auxiliar*/
 func (p *StConect) execAux(Data []StQuery, tipACC string, indvalid, indConect bool) error {
 	if len(Data) <= 0 {
