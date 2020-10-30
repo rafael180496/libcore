@@ -110,6 +110,7 @@ var (
 		"DB":   ".db",
 		"CSV":  ".csv",
 		"TXT":  ".txt",
+		"DBX":  ".dbx",
 	}
 )
 

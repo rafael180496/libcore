@@ -54,3 +54,8 @@ func (p *StError) MandError(mensaje string) error {
 	p.When = time.Now()
 	return p
 }
+
+/*StrErr : envia un string con errores personalizado*/
+func StrErr(str string) error {
+	return fmt.Errorf("%s", str)
+}

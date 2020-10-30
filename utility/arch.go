@@ -86,6 +86,19 @@ func (p *StLog) Init() error {
 	return nil
 }
 
+/*ReadFileStr : lee un archivo de texto y lo pasa a string*/
+func ReadFileStr(path string) (string, error) {
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	dataStr := BytetoStr(data)
+	if !IsNilStr(dataStr) {
+		return "", StrErr("El contenido del archivo esta vacio")
+	}
+	return dataStr, nil
+}
+
 /*NewStLog : Crea una nueva intancia de StLog */
 func NewStLog(dir, name, prefix string, fe time.Time) (StLog, error) {
 	LogNew := StLog{

@@ -165,22 +165,22 @@ func (p *ConfigServer) Valid() error {
 		p.Ipser = "localhost"
 	}
 	if p.Puerto <= 0 {
-		return fmt.Errorf("%s", "Puerto no valido.")
+		return utl.StrErr("Puerto no valido.")
 	}
 	if !utl.InStr(p.Protocol, HTTP, HTTPS) {
 		p.Protocol = HTTP
 	}
 	if p.Protocol == HTTPS {
 		if !utl.FileExist(p.DirSSL, true) {
-			return fmt.Errorf("%s", "Directorio SSL no existe.")
+			return utl.StrErr("Directorio SSL no existe.")
 		}
 		pathcert := utl.PlecaAdd(p.DirSSL) + p.CertFile
 		if !utl.FileExist(pathcert, false) {
-			return fmt.Errorf("%s", "Archivo del certificado no existe.")
+			return utl.StrErr("Archivo del certificado no existe.")
 		}
 		pathkey := utl.PlecaAdd(p.DirSSL) + p.KeyFile
 		if !utl.FileExist(pathkey, false) {
-			return fmt.Errorf("%s", "Archivo de la llave no existe.")
+			return utl.StrErr("Archivo de la llave no existe.")
 		}
 	}
 	return nil

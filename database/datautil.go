@@ -1,11 +1,13 @@
 package database
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
 	utl "github.com/rafael180496/libcore/utility"
+	"gopkg.in/ini.v1"
 )
 
 /*envTableData : convierte los datos en tipos  json */
@@ -160,4 +162,73 @@ func ScanDataGeneric(filas *sqlx.Rows, columnas []string, cantrows int, datachan
 	}
 	close(datachan)
 	close(errchan)
+}
+
+/*validTp : valida los tipos de conexion disponible*/
+func validTp(tp string) bool {
+	switch tp {
+	case SQLLite, Ora, Post, Mysql, Sqlser:
+		return true
+	default:
+		return false
+	}
+}
+func readIni(source interface{}) (StCadConect, error) {
+	var cnx StCadConect
+	cfg, err := ini.Load(source)
+	if err != nil {
+		return cnx, utl.Msj.GetError("CN11")
+	}
+	err = cfg.Section("database").MapTo(&cnx)
+	if err != nil {
+		return cnx, err
+	}
+	if !cnx.ValidCad() {
+		return cnx, utl.Msj.GetError("CN12")
+	}
+	return cnx, nil
+}
+
+/*DecripConect : desencripta una conexion de base de datos .ini con una encriptacion AES256 creada del mismo
+paquete utility*/
+func DecripConect(data []byte, pass string) (StCadConect, error) {
+	var cnx StCadConect
+	dataNew, err := utl.DesencripAES(pass, utl.BytetoStr(data))
+	if err != nil {
+		return cnx, err
+	}
+	cnx, err = readIni([]byte(dataNew))
+	if err != nil {
+		return cnx, err
+	}
+	return cnx, nil
+}
+
+/*CreateDBConect : Crea una conexion de base de datos valida y la genera como un .db con una clave aes*/
+func CreateDBConect(cnx StCadConect, pass string) ([]byte, error) {
+	pass = utl.Trim(pass)
+	if !utl.IsNilStr(pass) {
+		return nil, utl.StrErr("La clave esta vacia por favor introducir una clave")
+	}
+	if !cnx.ValidCad() {
+		return nil, utl.StrErr("La conexion no pasa las validaciones.")
+	}
+	cfg := ini.Empty()
+	sec, err := cfg.NewSection("database")
+	if err != nil {
+		return nil, err
+	}
+	err = sec.ReflectFrom(&cnx)
+	if err != nil {
+		return nil, err
+	}
+	cfg.DeleteSection("DEFAULT")
+	var buf bytes.Buffer
+	cfg.WriteTo(&buf)
+	data := buf.String()
+	dataencrip, err := utl.EncripAES(pass, data)
+	if err != nil {
+		return nil, err
+	}
+	return utl.StrtoByte(dataencrip), nil
 }

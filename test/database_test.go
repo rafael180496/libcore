@@ -45,6 +45,52 @@ func TestSqlLite(t *testing.T) {
 	t.Logf("prueba:%v", conexion.Test())
 }
 
+/*TestSqlLiteEncrip : Se conecta a una base de datos  sqllite de configuracion con clave aes256*/
+func TestSqlLiteEncrip(t *testing.T) {
+	var (
+		conexion db.StConect
+	)
+	pass := "abc123"
+	path := "config/sqllite.dbx"
+	t.Logf("Capturando path:%s", path)
+	err := conexion.ConfigDBX(path, pass)
+	if err != nil {
+		t.Errorf("Error:%s", err.Error())
+	}
+	t.Logf("Conexion:%s", conexion.Conexion.ToString())
+	t.Logf("Probando...")
+	t.Logf("prueba:%v", conexion.Test())
+}
+
+/*TestSqlLite : crea una conexion encriptada*/
+func TestCreateDB(t *testing.T) {
+	var (
+		conexion  db.StConect
+		cnxencrip []byte
+	)
+	pass := "abc123"
+	path := "config/sqllite.ini"
+	t.Logf("Capturando path:%s", path)
+	err := conexion.ConfigINI(path)
+	if err != nil {
+		t.Errorf("Error:%s", err.Error())
+	}
+	cnxencrip, err = db.CreateDBConect(conexion.Conexion, pass)
+	if err != nil {
+		t.Errorf("Error:%s", err.Error())
+	}
+	t.Logf("Data Encrip:%s", string(cnxencrip))
+	conexion.ResetCnx()
+	cnxdecrip, err := db.DecripConect(cnxencrip, pass)
+	if err != nil {
+		t.Errorf("Error:%s", err.Error())
+	}
+	conexion.Conexion = cnxdecrip
+	t.Logf("Conexion:%s", conexion.Conexion.ToString())
+	t.Logf("Probando...")
+	t.Logf("prueba:%v", conexion.Test())
+}
+
 /*TestPost : Se conecta a una base de datos  posgresql de configuracion*/
 func TestPost(t *testing.T) {
 	var (

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/go-ini/ini"
 	"github.com/jmoiron/sqlx"
 	utl "github.com/rafael180496/libcore/utility"
 
@@ -184,6 +183,23 @@ func (p *StConect) ConfigJSON(PathJSON string) error {
 	return nil
 }
 
+/*ConfigDBX : Lee las configuraciones de conexion mediante un archivo encriptado .dbx este se debe enviar la clave*/
+func (p *StConect) ConfigDBX(path, pass string) error {
+	if !utl.FileExt(path, "DBX") {
+		return utl.Msj.GetError("CN10")
+	}
+	dataraw, err := utl.ReadFileStr(path)
+	if err != nil {
+		return err
+	}
+	cad, err := DecripConect(utl.StrtoByte(dataraw), pass)
+	if err != nil {
+		return err
+	}
+	p.Conexion = cad
+	return nil
+}
+
 /*ConfigINI : Lee las configuraciones de conexion mediante un .ini
 
 Ejemplo:
@@ -208,22 +224,12 @@ filedb = opcional sqllite
 
 */
 func (p *StConect) ConfigINI(PathINI string) error {
-	var (
-		cad StCadConect
-	)
 	if !utl.FileExt(PathINI, "INI") {
 		return utl.Msj.GetError("CN10")
 	}
-	cfg, err := ini.Load(PathINI)
-	if err != nil {
-		return utl.Msj.GetError("CN11")
-	}
-	err = cfg.Section("database").MapTo(&cad)
+	cad, err := readIni(PathINI)
 	if err != nil {
 		return err
-	}
-	if !cad.ValidCad() {
-		return utl.Msj.GetError("CN12")
 	}
 	p.Conexion = cad
 	return nil
@@ -272,6 +278,9 @@ func (p *StCadConect) ToString() string {
 /*ValidCad : valida la cadena de conexion capturada */
 func (p *StCadConect) ValidCad() bool {
 	p.Trim()
+	if !validTp(p.Tipo) {
+		return false
+	}
 	if p.Tipo != SQLLite && (!utl.IsNilArrayStr(p.Clave, p.Usuario, p.Nombre, p.Tipo, p.Host) || p.Puerto <= 0) {
 		return false
 	}
@@ -359,7 +368,7 @@ func (p *StConect) ExecValid(Data []StQuery, tipacc string) error {
 /*QuerieNative :  ejecuta la funcion nativa del paquete sql*/
 func (p *StConect) QuerieNative(sql string, indConect bool, args ...interface{}) error {
 	if !utl.IsNilStr(sql) {
-		return fmt.Errorf("%s", "El querie esta vacio")
+		return utl.StrErr("El querie esta vacio")
 	}
 	err := p.Con()
 	if err != nil {
@@ -379,7 +388,7 @@ func (p *StConect) QuerieNative(sql string, indConect bool, args ...interface{})
 /*ExecNative :  ejecuta la funcion nativa del paquete sql*/
 func (p *StConect) ExecNative(sql string, indConect bool, args ...interface{}) error {
 	if !utl.IsNilStr(sql) {
-		return fmt.Errorf("%s", "El querie esta vacio")
+		return utl.StrErr("El querie esta vacio")
 	}
 	err := p.Con()
 	if err != nil {
