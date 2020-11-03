@@ -217,7 +217,6 @@ func sqldelete(table string, indices []string) string {
 func sqlupdate(table string, cols []string, indices []string) string {
 	sqltmp := fmt.Sprintf("UPDATE %s SET", table)
 	values := utl.FilterExcl(cols, indices)
-
 	for i, item := range values {
 		ind := (len(values) - 1)
 		sqltmp = fmt.Sprintf("%s %s = :%s%s", sqltmp, item, item, utl.ReturnIf(i == ind, "", " ,").(string))
