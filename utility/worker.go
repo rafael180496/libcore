@@ -37,7 +37,7 @@ func (p *Worker) Start() {
 
 /*StartTime : ejecuta un proceso paralelo mediante una hora especifica*/
 func (p *Worker) StartTime() {
-	if !DateEquals(p.fexec, time.Now()) {
+	if !DateEquals(p.fexec, time.Now()) && p.finalid {
 		p.finalid = false
 	}
 	if p.hr.EqualNow() && !p.finalid {
