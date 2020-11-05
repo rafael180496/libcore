@@ -5,13 +5,14 @@ import "time"
 type (
 	/*Worker : Orquestador de procesos paralelo*/
 	Worker struct {
-		start  bool
-		reset  bool
-		ticker *time.Ticker
-		hr     HrTime
-		job    Job
-		valid  chan bool
-		err    chan error
+		start   bool
+		finalid bool
+		fexec   time.Time
+		ticker  *time.Ticker
+		hr      HrTime
+		job     Job
+		valid   chan bool
+		err     chan error
 	}
 	/*Job : alias para un proceso*/
 	Job func(chan bool, chan error)
@@ -19,12 +20,9 @@ type (
 
 /*Finally : Finalizcion del proceso donde el indicativo reset es para reintentar secuencia*/
 func (p *Worker) Finally() {
-	if p.reset {
-		p.start = false
-	} else {
-		close(p.err)
-		close(p.valid)
-	}
+	p.start = false
+	close(p.err)
+	close(p.valid)
 }
 
 /*Start : Ejecuta el proceso paralelo*/
@@ -39,7 +37,12 @@ func (p *Worker) Start() {
 
 /*StartTime : ejecuta un proceso paralelo mediante una hora especifica*/
 func (p *Worker) StartTime() {
-	if p.hr.EqualNow() {
+	if !DateEquals(p.fexec, time.Now()) {
+		p.finalid = false
+	}
+	if p.hr.EqualNow() && !p.finalid {
+		p.fexec = time.Now()
+		p.finalid = true
 		p.Start()
 	}
 }
@@ -62,10 +65,10 @@ func (p *Worker) Err() <-chan error {
 /*NewWorkTicker : crea una tarea mediante un ticker para ponerlo en un servicio*/
 func NewWorkTicker(p *time.Ticker, job Job) Worker {
 	return Worker{
-		reset:  true,
-		job:    job,
-		ticker: p,
-		start:  false,
+		finalid: false,
+		job:     job,
+		ticker:  p,
+		start:   false,
 	}
 }
 
@@ -76,9 +79,9 @@ func NewWorkTime(hr, min int, job Job) (Worker, error) {
 		return Worker{}, err
 	}
 	return Worker{
-		reset: true,
-		job:   job,
-		hr:    hrTime,
-		start: false,
+		finalid: false,
+		job:     job,
+		hr:      hrTime,
+		start:   false,
 	}, nil
 }
