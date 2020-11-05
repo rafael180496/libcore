@@ -186,7 +186,7 @@ func (p *StConect) ConfigJSON(PathJSON string) error {
 /*ConfigDBX : Lee las configuraciones de conexion mediante un archivo encriptado .dbx este se debe enviar la clave*/
 func (p *StConect) ConfigDBX(path, pass string) error {
 	if !utl.FileExt(path, "DBX") {
-		return utl.Msj.GetError("CN10")
+		return utl.StrErr("No existe el archivo .dbx")
 	}
 	dataraw, err := utl.ReadFileStr(path)
 	if err != nil {
