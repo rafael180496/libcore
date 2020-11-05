@@ -360,6 +360,32 @@ func (p *StConect) Exec(Data []StQuery, indConect bool) error {
 	return p.execAux(Data, "", false, indConect)
 }
 
+/*ExecOne :Ejecuta un StQuery navito haciendo rollback con un error*/
+func (p *StConect) ExecOne(Data StQuery, indConect bool) error {
+	err := p.Con()
+	if err != nil {
+		return err
+	}
+	//Bloque de ejecucion
+	tx := p.DBGO.MustBegin()
+	_, err = tx.NamedExec(Data.Querie, Data.Args)
+	if err != nil {
+		p.Close()
+		tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	if err != nil {
+		p.Close()
+		tx.Rollback()
+		return err
+	}
+	if !indConect {
+		p.Close()
+	}
+	return nil
+}
+
 /*ExecValid :Ejecuta una accion de base de datos nativa con rollback y validacion de insert e delete o que tipo de accion es */
 func (p *StConect) ExecValid(Data []StQuery, tipacc string) error {
 	return p.execAux(Data, tipacc, true, false)
