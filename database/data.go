@@ -2,8 +2,6 @@ package database
 
 import (
 	"encoding/json"
-	"fmt"
-	"strconv"
 	"strings"
 
 	utl "github.com/rafael180496/libcore/utility"
@@ -134,71 +132,40 @@ func (p *StData) ToJSON() ([]byte, error) {
 func (p *StData) ToString(columna string) (string, error) {
 	var valor interface{}
 	valor = (*p)[columna]
-
-	switch valor.(type) {
-	case string:
-		return valor.(string), nil
-	case int:
-		return strconv.Itoa(valor.(int)), nil
-	case int32:
-		return utl.Int32ToStr(valor.(int32)), nil
-	case int64:
-		return utl.Int64ToStr(valor.(int64)), nil
-	case float64:
-		return utl.Float64ToStr(valor.(float64)), nil
-	case float32:
-		return utl.Float64ToStr(float64(valor.(float32))), nil
-
-	}
-	return fmt.Sprintf("%v", valor), utl.Msj.GetError("CN02")
+	return utl.ToString(valor), nil
 }
 
 /*ToInt : Convierte el valor del map interface{} a int.*/
 func (p *StData) ToInt(columna string) (int, error) {
 	var valor interface{}
 	valor = (*p)[columna]
-
-	switch valor.(type) {
-	case string:
-		return strconv.Atoi(valor.(string))
-	case int:
-		return valor.(int), nil
-	case int32:
-		return int(valor.(int32)), nil
-	case int64:
-		return int(valor.(int64)), nil
-
-	}
-
-	return 0, utl.Msj.GetError("CN03")
+	return utl.ToInt(valor), nil
 }
 
 /*ToBool : Convierte el valor del map interface{} a bool.*/
 func (p *StData) ToBool(columna string) bool {
 	var valor interface{}
 	valor = (*p)[columna]
-	switch valor.(type) {
-	case bool:
-		return valor.(bool)
-	default:
-		return false
-	}
+	return utl.ToBoolean(valor)
 }
 
 /*ToInt64 : Convierte el valor del map interface{} a int64.*/
 func (p *StData) ToInt64(columna string) (int64, error) {
 	var valor interface{}
 	valor = (*p)[columna]
+	return utl.ToInt64(valor), nil
+}
 
-	switch valor.(type) {
-	case string:
-		return utl.StrToInt64(valor.(string))
-	case int:
-		return int64(valor.(int)), nil
-	case int32:
-		return int64(valor.(int32)), nil
-	case int64:
-		return valor.(int64), nil
-	}
-	return 0, utl.Msj.GetError("CN03")
+/*ToFloat : Convierte el valor del map interface{} a float.*/
+func (p *StData) ToFloat(columna string) (float32, error) {
+	var valor interface{}
+	valor = (*p)[columna]
+	return utl.ToFloat(valor), nil
+}
+
+/*ToFloat64 : Convierte el valor del map interface{} a float.*/
+func (p *StData) ToFloat64(columna string) (float64, error) {
+	var valor interface{}
+	valor = (*p)[columna]
+	return utl.ToFloat64(valor), nil
 }
