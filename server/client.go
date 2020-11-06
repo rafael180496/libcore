@@ -2,10 +2,35 @@ package server
 
 import (
 	"bytes"
+	"encoding/base64"
+	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
+	"time"
 )
+
+/*BasicAuth : autentificacion basica de un client http */
+func BasicAuth(username, password string) string {
+	auth := fmt.Sprintf("%s:%s", username, password)
+	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+}
+
+/*NewNetClient : crea una instancia de http client*/
+func NewNetClient(timeout int) *http.Client {
+	var netTransport = &http.Transport{
+		Dial: (&net.Dialer{
+			Timeout: time.Duration(timeout) * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: time.Duration(timeout) * time.Second,
+	}
+	var netClient = &http.Client{
+		Timeout:   time.Second * time.Duration(timeout),
+		Transport: netTransport,
+	}
+	return netClient
+}
 
 /*AddQueryParameters : agrega los parametros para un param querie*/
 func AddQueryParameters(baseURL string, queryParams map[string]string) string {
