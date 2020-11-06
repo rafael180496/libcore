@@ -102,6 +102,19 @@ func (p *Date) HrTime() HrTime {
 	}
 }
 
+/*NewDateNow : crear un tipo date con la fecha actual*/
+func NewDateNow() Date {
+	date := Date{
+		Time: time.Now(),
+	}
+	return date
+}
+
+/*ToString : lo convierte  un date en string */
+func (p *Date) ToString() string {
+	return TimetoStr(p.Time)
+}
+
 /*Equals : Valida dos date a -> b
 
 1 -> mayor a
