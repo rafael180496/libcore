@@ -390,8 +390,8 @@ func ToInt(i interface{}) int {
 	case float32:
 		return int(s)
 	case string:
-		v, err := strconv.ParseFloat(s, 64)
-		return ReturnIf(err == nil, v, 0).(int)
+		v := ToFloat64(s)
+		return int(v)
 	case bool:
 		return ReturnIf(s, 1, 0).(int)
 	case nil:
