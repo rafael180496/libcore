@@ -21,8 +21,6 @@ type (
 /*Finally : Finalizcion del proceso donde el indicativo reset es para reintentar secuencia*/
 func (p *Worker) Finally() {
 	p.start = false
-	close(p.err)
-	close(p.valid)
 }
 
 /*Start : Ejecuta el proceso paralelo*/
