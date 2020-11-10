@@ -100,3 +100,10 @@ func (c *Client) Send(request Request) (*Response, error) {
 	}
 	return BuildResponse(res)
 }
+
+/*NewClient : crea una instancia client http*/
+func NewClient(timeout int) *Client {
+	return &Client{
+		HTTPClient: NewNetClient(timeout),
+	}
+}
