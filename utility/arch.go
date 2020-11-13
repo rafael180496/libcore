@@ -70,8 +70,16 @@ func (p *StLog) Printf(format string, args ...interface{}) error {
 	return nil
 }
 
+/*ValidF :  valida la fecha del log cargado*/
+func (p *StLog) ValidF() {
+	if !DateIdent(p.Fe, time.Now()) {
+		p.Fe = time.Now()
+	}
+}
+
 /*Init : Inicializa el log para comenzarlo a usar */
 func (p *StLog) Init() error {
+	p.ValidF()
 	NameArch := fmt.Sprintf("%s/%s%s.log", Trim(p.Dir), Trim(p.Name), Trim(TimetoStr(p.Fe)))
 	if !FileExist(p.Dir, true) {
 		return Msj.GetError("AR05")
