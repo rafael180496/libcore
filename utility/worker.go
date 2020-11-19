@@ -13,19 +13,25 @@ type (
 		job     Job
 		valid   chan bool
 		err     chan error
+		activo  bool
 	}
 	/*Job : alias para un proceso*/
 	Job func(chan bool, chan error)
 )
 
-/*Finally : Finalizcion del proceso donde el indicativo reset es para reintentar secuencia*/
+/*Finally : Finalizacion del proceso donde el indicativo reset es para reintentar secuencia*/
 func (p *Worker) Finally() {
 	p.start = false
 }
 
+/*SetActivo : modifica para que se desactive la tarea*/
+func (p *Worker) SetActivo(act bool) {
+	p.activo = act
+}
+
 /*Start : Ejecuta el proceso paralelo*/
 func (p *Worker) Start() {
-	if !p.start {
+	if !p.start && p.activo {
 		p.start = true
 		p.valid = make(chan bool)
 		p.err = make(chan error)
@@ -67,6 +73,7 @@ func NewWorkTicker(p *time.Ticker, job Job) Worker {
 		job:     job,
 		ticker:  p,
 		start:   false,
+		activo:  true,
 	}
 }
 
@@ -81,5 +88,6 @@ func NewWorkTime(hr, min int, job Job) (Worker, error) {
 		job:     job,
 		hr:      hrTime,
 		start:   false,
+		activo:  true,
 	}, nil
 }

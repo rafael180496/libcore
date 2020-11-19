@@ -79,6 +79,13 @@ func (p *StEmailAdmin) AddBody(content, header, body string) {
 	p.Email.BodyMsg = body
 }
 
+/*AddBodyHTML : agrega el cuerpo de un correo pudiendo agregar tambien html */
+func (p *StEmailAdmin) AddBodyHTML(header, body string) {
+	p.Email.HeadMsg = header
+	p.Email.ContentType = TypeContent["html"]
+	p.Email.BodyMsg = body
+}
+
 /*ArmarEmail : arma el correo en general html o  texto plano*/
 func (p *StEmailAdmin) ArmarEmail() string {
 	header := make(map[string]string)
