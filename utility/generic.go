@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"fmt"
 	"math/rand"
 	ramdom "math/rand"
 	"net/url"
@@ -9,6 +10,17 @@ import (
 	"unicode"
 	"unicode/utf8"
 )
+
+/*PrintMap : formatea un string con un mapa de datos este mapa de datos debe colocar
+las variables con {var1} para ser reemplazado por el dato*/
+func PrintMap(format string, data map[string]interface{}) string {
+	for key, item := range data {
+		str := ToString(item)
+		keyfinal := fmt.Sprintf("{%s}", key)
+		format = strings.Replace(format, keyfinal, str, -1)
+	}
+	return format
+}
 
 /*Reverse :  manda la reversa de un string */
 func Reverse(s string) string {
