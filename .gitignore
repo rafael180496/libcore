@@ -24,6 +24,7 @@ go.sum
 ### Go Patch ###
 /vendor/
 /Godeps/
+/test/config/ora.ini
 
 ### Linux ###
 *~

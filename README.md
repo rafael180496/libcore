@@ -45,7 +45,7 @@ funcione correctamente el proyecto.**
 
 * [fatih/color]([https://github.com/fatih/color])
 
-* [rana/ora]([https://gopkg.in/rana/ora.v4])
+* [go-ora]([https://github.com/sijms/go-ora])
 
 * [lib/pq]([https://github.com/lib/pq])
 

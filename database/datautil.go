@@ -24,7 +24,7 @@ func envTableData(tableData []map[string]interface{}, datachan chan utl.JSON, er
 func strURL(tipo string, conexion StCadConect) (string, string) {
 	switch tipo {
 	case Ora:
-		/*Open("ora", "user/passw@host:port/sid")*/
+		/*Open("oracle", "oracle://user:pass@server/service_name")*/
 		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
 	case Post:
 		/*"postgres://user:password@localhost:port/bdnamme?sslmode=verify-full"*/

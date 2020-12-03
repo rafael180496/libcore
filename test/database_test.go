@@ -96,7 +96,7 @@ func TestPost(t *testing.T) {
 	var (
 		conexion db.StConect
 	)
-	path := "/home/rhidalgo/Documentos/go_projects/src/github.com/rafael180496/libcore/test/src/post.ini"
+	path := "config/post.ini"
 	t.Logf("Capturando path:%s", path)
 	err := conexion.ConfigINI(path)
 	if err != nil {
@@ -114,9 +114,9 @@ func TestORA(t *testing.T) {
 	var (
 		conexion db.StConect
 	)
-	path := "/home/rhidalgo/Documentos/go_projects/src/github.com/rafael180496/libcore/test/src/ora.json"
+	path := "config/ora.ini"
 	t.Logf("Capturando path:%s", path)
-	err := conexion.ConfigJSON(path)
+	err := conexion.ConfigINI(path)
 	if err != nil {
 		t.Errorf("Error:%s", err.Error())
 	}
