@@ -41,8 +41,6 @@ const (
 	https://github.com/denisenkom/go-mssqldb
 	*/
 	Sqlser = "SQLSER"
-	/*PrefixG : prefijo general para los parametros en las consultas ejemplo : :val1 oracle ? post  */
-	PrefixG = ":n"
 	/*INSERT : prefijo de insert */
 	INSERT = "INSERT"
 	/*UPDATE : prefijo de UPDATE */
@@ -92,24 +90,15 @@ var (
 	}
 	/*CADCONN : contiene el formato de las cadenas de conexion*/
 	CADCONN = map[string]string{
-		Ora:     "oracle://%s:%s@%s:%d/%s",
+		Ora:     "%s/%s@%s:%d/%s",
 		Post:    "postgres://%s:%s@%s:%d/%s?sslmode=%s",
 		Mysql:   "%s:%s@tcp(%s:%d)/%s",
 		Sqlser:  "server=%s;user id=%s;password=%s;port=%d;database=%s;",
 		SQLLite: "%s",
 	}
-	/*Prefijos : contiene  los diferentes prefijos de distintas base de datos.
-	Ejemplo: select * from cliente where nombre=:n sera reemplazada por :val*/
-	Prefijos = map[string]string{
-		Ora:     ":val",
-		Post:    "$",
-		Mysql:   "?",
-		Sqlser:  ":",
-		SQLLite: "?",
-	}
 	/*PrefijosDB : contiene los string de conexion al momento de ejecutar la funcion open*/
 	PrefijosDB = map[string]string{
-		Ora:     "oracle",
+		Ora:     "ora",
 		Post:    "postgres",
 		Mysql:   "mysql",
 		Sqlser:  "mssql",
