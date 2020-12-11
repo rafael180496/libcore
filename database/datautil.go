@@ -232,3 +232,24 @@ func CreateDBConect(cnx StCadConect, pass string) ([]byte, error) {
 	}
 	return utl.StrtoByte(dataencrip), nil
 }
+
+/*CreateDbFile : crea un archivo de configuracion valida para base de datos encriptado*/
+func CreateDbFile(cnx StCadConect, pass, dir, name string) error {
+	if !utl.FileExist(dir, true) {
+		return fmt.Errorf("El directorio destino no existe")
+	}
+	dir = utl.PlecaAdd(dir)
+	f, err := utl.FileNew(dir + name)
+	if err != nil {
+		return err
+	}
+	data, err := CreateDBConect(cnx, pass)
+	if err != nil {
+		return err
+	}
+	_, err = f.Write(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}

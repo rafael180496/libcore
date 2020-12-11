@@ -195,22 +195,37 @@ func DirNew(Path string) error {
 	return nil
 }
 
+/*Open :  abre un archivo X*/
+func Open(Path string) (*os.File, error) {
+	if !FileExist(Path, false) {
+		return nil, Msj.GetError("AR01")
+	}
+	fileOrig, err := os.Open(Path)
+	return fileOrig, err
+}
+
+/*Write : escrive los datos en un archivo X*/
+func Write(Path string, data []byte) error {
+	f, err := Open(Path)
+	if err != nil {
+		return err
+	}
+	_, err = f.Write(data)
+	if err != nil {
+		return err
+	}
+	f.Close()
+	return nil
+}
+
 /*CpFile : copia un archivo Origen a un directorio destino*/
 func CpFile(PathOrig, PathDest string) error {
 	fileNew := new(os.File)
 	PathDest = PlecaAdd(PathDest)
-	if !FileExist(PathOrig, false) {
-		return Msj.GetError("AR01")
-	}
 	if !FileExist(PathDest, true) {
 		return Msj.GetError("AR05")
 	}
-
-	pathNew, err := TrimFile(PathOrig)
-	if err != nil {
-		return err
-	}
-	fileOrig, err := os.Open(pathNew)
+	fileOrig, err := Open(PathOrig)
 	if err != nil {
 		return err
 	}

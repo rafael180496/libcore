@@ -11,7 +11,6 @@ import (
 
 /*MapKeys : Conviert un map a interface o datos dinamicos.*/
 func MapKeys(data *map[interface{}]interface{}) []interface{} {
-
 	keys := make([]interface{}, len(*data))
 	i := 0
 	for key := range *data {
@@ -23,7 +22,6 @@ func MapKeys(data *map[interface{}]interface{}) []interface{} {
 
 /*MapStrKeys : Convierte un map a arreglo de string*/
 func MapStrKeys(data *map[string]interface{}) []string {
-
 	keys := make([]string, len(*data))
 	i := 0
 	for key := range *data {
