@@ -239,7 +239,7 @@ func CreateDbFile(cnx StCadConect, pass, dir, name string) error {
 		return fmt.Errorf("El directorio destino no existe")
 	}
 	dir = utl.PlecaAdd(dir)
-	f, err := utl.FileNew(dir + name)
+	f, err := utl.FileNew(dir + name + utl.EXT["DBX"])
 	if err != nil {
 		return err
 	}
