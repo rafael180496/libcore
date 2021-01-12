@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	utl "github.com/rafael180496/libcore/utility"
@@ -30,4 +31,28 @@ func TestFloat64(t *testing.T) {
 	t.Logf("valor:[%f]", valor)
 	valor = utl.RoundFloat64(valor, 2)
 	t.Logf("valor:[%f]", valor)
+}
+
+/*Test_Merge_string : combina unas cadena de caracteres*/
+func Test_Merge_string(t *testing.T) {
+	a := ""
+	b := "foo"
+	expected := "foo"
+	ret := utl.Merge(a, b)
+
+	if !reflect.DeepEqual(ret, expected) {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
+
+/*Test_Merge_Array : combina los array de un mismo tipo de datos*/
+func Test_Merge_Array(t *testing.T) {
+	a := []int{10, 11, 12}
+	b := []int{}
+	expected := []int{10, 11, 12}
+	ret := utl.Merge(a, b)
+
+	if !reflect.DeepEqual(ret, expected) {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
 }

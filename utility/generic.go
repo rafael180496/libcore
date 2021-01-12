@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	ramdom "math/rand"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 	"unicode"
@@ -212,4 +213,112 @@ func IsSpace(str string) bool {
 		return r
 	}, str)
 	return rest
+}
+
+/*IsEmptyVl : valida si el valor esta vacio*/
+func IsEmptyVl(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
+		return v.Len() == 0
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	case reflect.Interface, reflect.Ptr:
+		return v.IsNil()
+	}
+	return false
+}
+
+/*Merge : combina variables array o string en un solo valor conjunto*/
+func Merge(base, override interface{}) interface{} {
+	b := reflect.ValueOf(base)
+	o := reflect.ValueOf(override)
+	ret := mergeBase(b, o)
+	return ret.Interface()
+}
+
+func mergeBase(base, override reflect.Value) reflect.Value {
+	var result reflect.Value
+	switch base.Kind() {
+	case reflect.Ptr:
+		switch base.Elem().Kind() {
+		case reflect.Ptr:
+			fallthrough
+		case reflect.Interface:
+			fallthrough
+		case reflect.Struct:
+			fallthrough
+		case reflect.Map:
+			if base.IsNil() {
+				result = override
+			} else if override.IsNil() {
+				result = base
+			} else {
+				result = mergeBase(base.Elem(), override.Elem())
+			}
+		default:
+			if IsEmptyVl(override) {
+				result = base
+			} else {
+				result = override
+			}
+		}
+	case reflect.Interface:
+		result = mergeBase(base.Elem(), override.Elem())
+	case reflect.Struct:
+		result = reflect.New(base.Type())
+		for i, n := 0, base.NumField(); i < n; i++ {
+			if result.Elem().Field(i).CanSet() {
+				vl := mergeBase(base.Field(i), override.Field(i))
+				if result.Elem().Field(i).CanSet() && vl.IsValid() {
+					if vl.Kind() == reflect.Ptr && result.Elem().Field(i).Kind() != reflect.Ptr {
+						vl = vl.Elem()
+					} else if result.Elem().Field(i).Kind() == reflect.Ptr && vl.Kind() != reflect.Ptr && vl.CanAddr() {
+						vl = vl.Addr()
+					}
+					result.Elem().Field(i).Set(vl)
+				}
+			}
+		}
+
+	case reflect.Map:
+		element := base.Type().Elem().Kind() != reflect.Ptr
+		result = reflect.MakeMap(base.Type())
+		for _, key := range base.MapKeys() {
+			result.SetMapIndex(key, base.MapIndex(key))
+		}
+		if override.Kind() == reflect.Map {
+			for _, key := range override.MapKeys() {
+				overrideVal := override.MapIndex(key)
+				baseVal := base.MapIndex(key)
+				if !overrideVal.IsValid() {
+					continue
+				}
+				if !baseVal.IsValid() {
+					result.SetMapIndex(key, overrideVal)
+					continue
+				}
+				vl := mergeBase(baseVal, overrideVal)
+				if element && vl.Kind() == reflect.Ptr {
+					result.SetMapIndex(key, vl.Elem())
+
+				} else {
+					result.SetMapIndex(key, vl)
+				}
+			}
+		}
+
+	default:
+		if IsEmptyVl(override) {
+			result = base
+		} else {
+			result = override
+		}
+	}
+	return result
 }
