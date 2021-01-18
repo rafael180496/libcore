@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	utl "github.com/rafael180496/libcore/utility"
@@ -155,8 +156,17 @@ func (p *ConfigServer) LoadIni(path string) error {
 	return p.Valid()
 }
 
+/*loadEnv : carga algunas variables por medio de variables de entorno*/
+func (p *ConfigServer) loadEnv() error {
+	p.Puerto = utl.ToInt(os.Getenv("PORT"))
+	return nil
+}
+
 /*Valid : valida la estructa y la configura para el servicio*/
 func (p *ConfigServer) Valid() error {
+	if p.Env {
+		p.loadEnv()
+	}
 	p.Ipser = utl.Trim(p.Ipser)
 	if p.Ipser == "" {
 		p.Ipser = utl.GetLocalIPV4()

@@ -73,6 +73,8 @@ type (
 		KeyFile string `ini:"keyfile"`
 		/*DirSSL : carpeta donde esta el certificado*/
 		DirSSL string `ini:"dirssl"`
+		/*Env :  carga todas las variables en variables de entorno*/
+		Env bool `ini:"env"`
 	}
 	/*StInfoPet : envia la informacion general de la peticion */
 	StInfoPet struct {
