@@ -1,7 +1,6 @@
 package database
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 
@@ -189,67 +188,86 @@ func readIni(source interface{}) (StCadConect, error) {
 	return cnx, nil
 }
 
-/*DecripConect : desencripta una conexion de base de datos .ini con una encriptacion AES256 creada del mismo
-paquete utility*/
-func DecripConect(data []byte, pass string) (StCadConect, error) {
-	var cnx StCadConect
-	dataNew, err := utl.DesencripAES(pass, utl.BytetoStr(data))
-	if err != nil {
-		return cnx, err
+/*funcion para crear base de datos sqllite*/
+func (p *StConect) createDB() error {
+	if utl.FileExt(p.Conexion.File, "DB") {
+		return nil
 	}
-	cnx, err = readIni([]byte(dataNew))
+	_, err := utl.FileNew(p.Conexion.File)
 	if err != nil {
-		return cnx, err
+		return err
 	}
-	return cnx, nil
+	return utl.Msj.GetError("CN23")
 }
 
-/*CreateDBConect : Crea una conexion de base de datos valida y la genera como un .db con una clave aes*/
-func CreateDBConect(cnx StCadConect, pass string) ([]byte, error) {
-	pass = utl.Trim(pass)
-	if !utl.IsNilStr(pass) {
-		return nil, utl.StrErr("La clave esta vacia por favor introducir una clave")
-	}
-	if !cnx.ValidCad() {
-		return nil, utl.StrErr("La conexion no pasa las validaciones.")
-	}
-	cfg := ini.Empty()
-	sec, err := cfg.NewSection("database")
+/*queryGeneric : ejecuta sql dinamicos regresando un map*/
+func (p *StConect) queryGeneric(query StQuery, cantrow int, indConect, indLimit bool) ([]StData, error) {
+	var (
+		err     error
+		filas   *sqlx.Rows
+		result  []StData
+		args    []interface{}
+		sqltemp string
+	)
+	err = p.Con()
 	if err != nil {
-		return nil, err
+		return result, err
 	}
-	err = sec.ReflectFrom(&cnx)
+	sqltemp, args, err = p.NamedIn(query)
+	filas, err = p.DBGO.Queryx(sqltemp, args...)
 	if err != nil {
-		return nil, err
+		p.Close()
+		return result, err
 	}
-	cfg.DeleteSection("DEFAULT")
-	var buf bytes.Buffer
-	cfg.WriteTo(&buf)
-	data := buf.String()
-	dataencrip, err := utl.EncripAES(pass, data)
+	result, err = scanData(filas, cantrow, indLimit)
 	if err != nil {
-		return nil, err
+		p.Close()
+		filas.Close()
+		err = utl.Msj.GetError("CN16")
+		return result, err
 	}
-	return utl.StrtoByte(dataencrip), nil
+	if !indConect {
+		p.Close()
+	}
+	filas.Close()
+	return result, nil
 }
 
-/*CreateDbFile : crea un archivo de configuracion valida para base de datos encriptado*/
-func CreateDbFile(cnx StCadConect, pass, dir, name string) error {
-	if !utl.FileExist(dir, true) {
-		return fmt.Errorf("El directorio destino no existe")
+/*execAux : Ejecuta una accion de base de datos  auxiliar*/
+func (p *StConect) execAux(Data []StQuery, tipACC string, indvalid, indConect bool) error {
+	if len(Data) <= 0 {
+		return utl.Msj.GetError("CN22")
 	}
-	dir = utl.PlecaAdd(dir)
-	f, err := utl.FileNew(dir + name + utl.EXT["DBX"])
+	err := p.Con()
 	if err != nil {
 		return err
 	}
-	data, err := CreateDBConect(cnx, pass)
+	//Bloque de ejecucion
+	tx := p.DBGO.MustBegin()
+	for _, dat := range Data {
+		if indvalid {
+			err = validTipDB(dat.Querie, tipACC)
+			if err != nil {
+				p.Close()
+				tx.Rollback()
+				return err
+			}
+		}
+		_, err = tx.NamedExec(dat.Querie, dat.Args)
+		if err != nil {
+			p.Close()
+			tx.Rollback()
+			return err
+		}
+	}
+	err = tx.Commit()
 	if err != nil {
+		p.Close()
+		tx.Rollback()
 		return err
 	}
-	_, err = f.Write(data)
-	if err != nil {
-		return err
+	if !indConect {
+		p.Close()
 	}
 	return nil
 }

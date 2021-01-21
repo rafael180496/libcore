@@ -3,6 +3,7 @@ package database
 import (
 	"encoding/json"
 	"strings"
+	"time"
 
 	utl "github.com/rafael180496/libcore/utility"
 )
@@ -142,6 +143,13 @@ func (p *StData) ToInt(columna string) (int, error) {
 	return utl.ToInt(valor), nil
 }
 
+/*ToInt32 : Convierte el valor del map interface{} a int32.*/
+func (p *StData) ToInt32(columna string) int32 {
+	var valor interface{}
+	valor = (*p)[columna]
+	return utl.ToInt32(valor)
+}
+
 /*ToBool : Convierte el valor del map interface{} a bool.*/
 func (p *StData) ToBool(columna string) bool {
 	var valor interface{}
@@ -168,4 +176,12 @@ func (p *StData) ToFloat64(columna string) (float64, error) {
 	var valor interface{}
 	valor = (*p)[columna]
 	return utl.ToFloat64(valor), nil
+}
+
+/*ToDate : Convierte el valor del map interface{} a time.*/
+func (p *StData) ToDate(columna string) (time.Time, error) {
+	var valor interface{}
+	valor = (*p)[columna]
+	vl := utl.ToString(valor)
+	return utl.StringToDate(vl)
 }

@@ -158,8 +158,16 @@ func (p *ConfigServer) LoadIni(path string) error {
 
 /*loadEnv : carga algunas variables por medio de variables de entorno*/
 func (p *ConfigServer) loadEnv() error {
-	p.Puerto = utl.ToInt(os.Getenv("PORT"))
-	return nil
+	var err error
+	utl.Block{
+		Try: func() {
+			p.Puerto = utl.ToInt(os.Getenv("PORT"))
+		},
+		Catch: func(e utl.Exception) {
+			err = fmt.Errorf("Error al capturar una variable en paquete server")
+		},
+	}.Do()
+	return err
 }
 
 /*Valid : valida la estructa y la configura para el servicio*/
