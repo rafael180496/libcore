@@ -16,6 +16,15 @@ type (
 	}
 )
 
+/*NewDataTable : Crea un datable correctamente*/
+func NewDataTable(table string, rows []StData, index []string) DataTable {
+	var data DataTable
+	data.SetTable(table)
+	data.AddIndexs(index...)
+	data.AddRows(rows...)
+	return data
+}
+
 /*ValidRow : valida si tiene filas llenadas*/
 func (p *DataTable) ValidRow() bool {
 	return utl.ReturnIf(len(p.rows) > 0, true, false).(bool)
