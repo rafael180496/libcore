@@ -3,7 +3,7 @@ package utility
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
+	"io/fs"
 	"log"
 	"os"
 	"strings"
@@ -96,7 +96,7 @@ func (p *StLog) Init() error {
 
 /*ReadFileStr : lee un archivo de texto y lo pasa a string*/
 func ReadFileStr(path string) (string, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
@@ -323,12 +323,12 @@ func RmFile(file string) error {
 }
 
 /*ListDir : lista la infomacion que contiene una carpeta*/
-func ListDir(src string) ([]os.FileInfo, error) {
+func ListDir(src string) ([]fs.DirEntry, error) {
 	src = PlecaAdd(src)
 	if !FileExist(src, true) {
 		return nil, Msj.GetError("AR05")
 	}
-	files, err := ioutil.ReadDir(src)
+	files, err := os.ReadDir(src)
 	if err != nil {
 		return nil, Msj.GetError("AR06")
 	}
