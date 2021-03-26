@@ -17,6 +17,9 @@ func TestAes(t *testing.T) {
 	}
 	t.Logf("BloqueEncrip:%s", bloque)
 	bloque, err = utl.DesencripAES(key, bloque)
+	if err != nil {
+		t.Errorf("Error:%s", err.Error())
+	}
 	t.Logf("BloqueDesencrip:%s", bloque)
 }
 

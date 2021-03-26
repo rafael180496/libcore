@@ -2,6 +2,7 @@ package utility
 
 import (
 	"encoding/xml"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -17,10 +18,53 @@ type (
 	}
 )
 
+/*NewTicker : Crea un nuevo ticker por medio de formatos
+hr -> horas
+min -> minutos
+*/
+func NewTicker(ft, tp string) (*time.Ticker, error) {
+	var err error
+	timeTicker := new(time.Ticker)
+	Block{
+		Try: func() {
+			dataint := ToInt(ft)
+			switch tp {
+			case "hr":
+				timeTicker = time.NewTicker(time.Duration(dataint) * time.Hour)
+			case "min":
+				timeTicker = time.NewTicker(time.Duration(dataint) * time.Minute)
+			default:
+				err = fmt.Errorf("tipo no es valido por favor solo hr,min")
+			}
+		},
+		Catch: func(e Exception) {
+			err = fmt.Errorf("error en conversion del formato")
+		},
+	}.Do()
+	return timeTicker, err
+}
+func NewHrTimeStr(fr string) (HrTime, error) {
+	var (
+		err    error
+		hrtime HrTime
+	)
+	Block{
+		Try: func() {
+			hr := ToInt(SubString(fr, 0, 2))
+			min := ToInt(SubString(fr, 3, 5))
+			hrtime, err = NewHrTime(hr, min)
+		},
+		Catch: func(e Exception) {
+			err = fmt.Errorf("error en conversion del formato")
+		},
+	}.Do()
+	return hrtime, err
+}
+
 /*Valid : valida la estructura*/
 func (p *HrTime) Valid() error {
 	if p.hr > 24 || p.hr < 0 {
-		return StrErr("La hora es invalida colocar en formato de 24HR")
+		return StrErr("la hora es invalida colocar en formato de 24HR")
 	}
 	if p.min > 59 || p.min < 0 {
 		return StrErr("los Minutos es invalida colocar en formato de 59Min")

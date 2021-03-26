@@ -10,7 +10,8 @@ import (
 
 /*SubString : recorta una cadena */
 func TestSubString(t *testing.T) {
-	fmt.Printf("%s", utl.SubString("hola", 0, 2))
+	fmt.Printf("%s", utl.SubString("18:20", 0, 2))
+	fmt.Printf("%s", utl.SubString("18:20", 3, 5))
 }
 
 /*TestReturnIf : retorna con un condicional */

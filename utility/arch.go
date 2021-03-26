@@ -220,7 +220,6 @@ func Write(Path string, data []byte) error {
 
 /*CpFile : copia un archivo Origen a un directorio destino*/
 func CpFile(PathOrig, PathDest string) error {
-	fileNew := new(os.File)
 	PathDest = PlecaAdd(PathDest)
 	if !FileExist(PathDest, true) {
 		return Msj.GetError("AR05")
@@ -234,7 +233,7 @@ func CpFile(PathOrig, PathDest string) error {
 		return err
 	}
 	pathFinal := PathDest + infoFile.Name()
-	fileNew, err = FileNew(pathFinal)
+	fileNew, err := FileNew(pathFinal)
 	if err != nil {
 		return err
 	}

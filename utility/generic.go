@@ -2,7 +2,6 @@ package utility
 
 import (
 	"fmt"
-	"math/rand"
 	ramdom "math/rand"
 	"net/url"
 	"reflect"
@@ -81,7 +80,7 @@ func ValidDuplidArrayStr(strs []string) bool {
 	return true
 }
 func accStr(str, acc string) string {
-	return ReturnIf("u" == acc, strings.ToUpper(acc), strings.ToLower(str)).(string)
+	return ReturnIf(acc == "u", strings.ToUpper(acc), strings.ToLower(str)).(string)
 }
 func accStrs(acc string, strs ...string) []string {
 	var strsNew []string
@@ -183,13 +182,23 @@ func CharRand(Upper bool) string {
 /*RandInt : envia un numero aleatorio*/
 func RandInt(min, max int) int {
 	ramdom.Seed(time.Now().UnixNano())
-	return min + rand.Intn(max-min)
+	return min + ramdom.Intn(max-min)
 }
 
 /*SubString : substring para un string en golang con runas*/
-func SubString(cadena string, ini, cant int) string {
-	runes := []rune(cadena)
-	return string(runes[0:2])
+func SubString(s string, start, end int) string {
+	start_str_idx := 0
+	i := 0
+	for j := range s {
+		if i == start {
+			start_str_idx = j
+		}
+		if i == end {
+			return s[start_str_idx:j]
+		}
+		i++
+	}
+	return s[start_str_idx:]
 }
 
 /*Trim : Elimina el espacio de un string a nivel de runas.*/
@@ -204,15 +213,12 @@ func Trim(str string) string {
 
 /*IsSpace : valida si la cadena contiene espacio. */
 func IsSpace(str string) bool {
-	rest := false
-	strings.Map(func(r rune) rune {
-		if unicode.IsSpace(r) {
-			rest = true
-			return -1
+	for _, v := range str {
+		if unicode.IsSpace(v) {
+			return true
 		}
-		return r
-	}, str)
-	return rest
+	}
+	return false
 }
 
 /*IsEmptyVl : valida si el valor esta vacio*/
