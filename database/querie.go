@@ -37,7 +37,7 @@ func (p *StConect) QueryOne(query StQuery, indConect bool) (StData, error) {
 		return nil, err
 	}
 	if len(result) <= 0 {
-		return nil, fmt.Errorf("No hay datos en la consulta")
+		return nil, fmt.Errorf("no hay datos en la consulta")
 	}
 
 	return result[0], nil

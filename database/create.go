@@ -55,7 +55,7 @@ func CreateDBConect(cnx StCadConect, pass string) ([]byte, error) {
 /*CreateDbFile : crea un archivo de configuracion valida para base de datos encriptado*/
 func CreateDbFile(cnx StCadConect, pass, dir, name string) error {
 	if !utl.FileExist(dir, true) {
-		return fmt.Errorf("El directorio destino no existe")
+		return fmt.Errorf("el directorio destino no existe")
 	}
 	dir = utl.PlecaAdd(dir)
 	f, err := utl.FileNew(dir + name + utl.EXT["DBX"])

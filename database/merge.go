@@ -40,7 +40,7 @@ func (p *StMerge) LoadDataIn() ([]DataTable, error) {
 		}
 	}
 	if len(p.ItemsExt) <= 0 {
-		return result, fmt.Errorf("Los extractores estan vacio")
+		return result, fmt.Errorf("los extractores estan vacio")
 	}
 	for _, v := range p.ItemsExt {
 		data, err := cnx.QueryMap(v.SQLIn, 0, true, false)

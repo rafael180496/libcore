@@ -8,42 +8,90 @@ import (
 )
 
 type (
-
+	/*ConfigWorker : configuracion del worker maestro para integracion de demonio */
+	ConfigWorker struct {
+		Workers   FormatWorker `json:"workers"`
+		ConfigDir StArchMa     `json:"files"`
+		Pathlog   string       `json:"pathlog"`
+		Debug     bool         `json:"debug"`
+	}
 	/*FormatWorker : contiene los formatos de los worker para poder obtenerlos de forma de un json*/
 	FormatWorker []struct {
-		Tp  string `json:"tp"`
+		Tp  string `json:"type"`
 		Key string `json:"key"`
-		Fr  string `json:"fr"`
+		Fr  string `json:"format"`
 	}
 	/*MasterWorker : contiene varios worker y se administran de forma individual con maps*/
 	MasterWorker struct {
-		Jobs   map[string]Job
-		Config FormatWorker
+		Jobs     map[string]Job
+		pathjson string
+		config   ConfigWorker
+		logs     map[string]*StLog
+		workers  map[string]*Worker
 	}
-	/*Worker : Orquestador de procesos paralelo*/
-	Worker struct {
-		start     bool
-		finalid   bool
-		fexec     time.Time
-		ticker    *time.Ticker
-		hr        HrTime
-		job       Job
-		valid     chan bool
-		err       chan error
-		activo    bool
-		indticker bool
-	}
-	/*Job : alias para un proceso*/
-	Job func(chan bool, chan error)
 )
 
-func (p *MasterWorker) ReloadWork(key string) (*Worker, error) {
+/*SendWork : Reconfigura un worker el tiempo de ejecucion*/
+func (p *MasterWorker) SendWork(key string) (*Worker, error) {
+	err := p.ReloadWork(key)
+	if err != nil {
+		return nil, err
+	}
+	return p.workers[key], nil
+}
+
+/*Loadmaster : carga todas las configuraciones del master workers*/
+func (p *MasterWorker) Loadmaster() error {
+	err := p.loaddir()
+	if err != nil {
+		return err
+	}
+	err = p.loadlog()
+	if err != nil {
+		return err
+	}
+	err = p.loadworks()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*NewMasterWorker :  Crea un MasterWorker*/
+func NewMasterWorker(Jobs map[string]Job, config string, indload bool) (MasterWorker, error) {
+	master := MasterWorker{
+		pathjson: config,
+		Jobs:     Jobs,
+	}
+	err := master.LoadConfig(config)
+	if err != nil {
+		return master, err
+	}
+	if indload {
+		err := master.Loadmaster()
+		if err != nil {
+			return master, err
+		}
+	}
+
+	return master, nil
+}
+
+/*ReloadWork : recarga un workers para recargar todos sus parametros*/
+func (p *MasterWorker) ReloadWork(key string) error {
 	var TaskMap Worker
 	var err error
 	indresp := false
+	if !p.ValidWork(key) {
+		return fmt.Errorf("el work no existe")
+	}
+	err = p.ReloadConfig()
+	if err != nil {
+		return err
+	}
 	Block{
 		Try: func() {
-			for _, v := range p.Config {
+			for _, v := range p.config.Workers {
 				if v.Key == key {
 					work, err := NewWork(v.Fr, v.Tp, p.Jobs[v.Key])
 					if err != nil {
@@ -60,18 +108,76 @@ func (p *MasterWorker) ReloadWork(key string) (*Worker, error) {
 		},
 	}.Do()
 	if !indresp {
-		return nil, fmt.Errorf("el work no existe")
+		return fmt.Errorf("el work no existe")
 	}
-	return &TaskMap, err
+	p.workers[key] = &TaskMap
+	return err
+}
+
+/*Finally : Finalizacion del proceso donde el indicativo reset es para reintentar secuencia*/
+func (p *MasterWorker) Finally(key string) {
+	if p.ValidWork(key) {
+		p.workers[key].Finally()
+	}
+}
+
+/*StartGen : ejecuta una tarea en paralelo en forma general*/
+func (p *MasterWorker) StartGen(key string) {
+	if p.ValidWork(key) {
+		p.workers[key].StartGen()
+	}
+}
+
+/*SetActivo : modifica para que se desactive la tarea*/
+func (p *MasterWorker) SetActivo(key string, act bool) {
+	if p.ValidWork(key) {
+		p.workers[key].SetActivo(act)
+	}
+}
+
+/*ValidWork :  valida si existe un worker*/
+func (p *MasterWorker) ValidWork(key string) bool {
+	_, ok := p.workers[key]
+	return ok
+}
+
+/*Tick : regresa el secuencial de tiempo*/
+func (p *MasterWorker) Tick(key string) <-chan time.Time {
+	if p.ValidWork(key) {
+		return p.workers[key].Tick()
+	}
+	return nil
+}
+
+/*Valid : envia si el proceso termino*/
+func (p *MasterWorker) Valid(key string) <-chan bool {
+	if p.ValidWork(key) {
+		return p.workers[key].Valid()
+	}
+	return nil
+}
+
+/*Err :  envia el error en un canal de ejecucion*/
+func (p *MasterWorker) Err(key string) <-chan error {
+	if p.ValidWork(key) {
+		return p.workers[key].Err()
+	}
+	return nil
 }
 
 /*LoadWorkers : carga todos los worker y lo envie en un map*/
 func (p *MasterWorker) LoadWorkers() (map[string]*Worker, error) {
+	err := p.loadworks()
+	return p.workers, err
+}
+
+/*loadworks : carga todos los works con los archivos de configuracion*/
+func (p *MasterWorker) loadworks() error {
 	TaskMap := make(map[string]*Worker)
 	var err error
 	Block{
 		Try: func() {
-			for _, v := range p.Config {
+			for _, v := range p.config.Workers {
 				work, err := NewWork(v.Fr, v.Tp, p.Jobs[v.Key])
 				if err != nil {
 					break
@@ -83,19 +189,23 @@ func (p *MasterWorker) LoadWorkers() (map[string]*Worker, error) {
 			err = fmt.Errorf("error en procesar el map workers")
 		},
 	}.Do()
-	return TaskMap, err
+	if err == nil {
+		p.workers = TaskMap
+	}
+	return err
 }
 
 /*LoadConfig : carga el archivo de configuracion de los worker como archivo json*/
 func (p *MasterWorker) LoadConfig(PathJSON string) error {
 	var (
 		err     error
-		config  FormatWorker
+		config  ConfigWorker
 		ptrArch *os.File
 	)
 	if !FileExt(PathJSON, "JSON") {
 		return Msj.GetError("CN09")
 	}
+	p.pathjson = PathJSON
 	PathJSON, err = TrimFile(PathJSON)
 	if err != nil {
 		return Msj.GetError("CN08")
@@ -110,121 +220,91 @@ func (p *MasterWorker) LoadConfig(PathJSON string) error {
 	if err != nil {
 		return Msj.GetError("CN08")
 	}
+	p.config = config
 	return nil
 }
 
-/*Finally : Finalizacion del proceso donde el indicativo reset es para reintentar secuencia*/
-func (p *Worker) Finally() {
-	p.start = false
+/*ReloadConfig : recarga el archivo de configuracion por cualquier cambio de los workers*/
+func (p *MasterWorker) ReloadConfig() error {
+	return p.LoadConfig(p.pathjson)
 }
 
-/*SetActivo : modifica para que se desactive la tarea*/
-func (p *Worker) SetActivo(act bool) {
-	p.activo = act
-}
-
-/*StartGen : ejecuta una tarea en paralelo en forma general*/
-func (p *Worker) StartGen() {
-	if p.indticker {
-		p.Start()
-	} else {
-		p.StartTime()
-	}
-}
-
-/*Start : Ejecuta el proceso paralelo*/
-func (p *Worker) Start() {
-	if !p.start && p.activo {
-		p.start = true
-		p.valid = make(chan bool)
-		p.err = make(chan error)
-		go p.job(p.valid, p.err)
-	}
-}
-
-/*StartTime : ejecuta un proceso paralelo mediante una hora especifica*/
-func (p *Worker) StartTime() {
-	if !DateEquals(p.fexec, time.Now()) && p.finalid {
-		p.finalid = false
-	}
-	if p.hr.EqualNow() && !p.finalid {
-		p.fexec = time.Now()
-		p.finalid = true
-		p.Start()
-	}
-}
-
-/*Tick : regresa el secuencial de tiempo*/
-func (p *Worker) Tick() <-chan time.Time {
-	return p.ticker.C
-}
-
-/*Valid : envia si el proceso termino*/
-func (p *Worker) Valid() <-chan bool {
-	return p.valid
-}
-
-/*Err :  envia el error en un canal de ejecucion*/
-func (p *Worker) Err() <-chan error {
-	return p.err
-}
-
-/*NewWork : crea una tarea con formatos y tipo de de secuencia
-1 - Ticker
-2 - Time
-Formatos:
-05 hr
-54 min
-12:16 time
-*/
-func NewWork(format, tp string, job Job) (Worker, error) {
-	switch tp {
-	case "hr", "min":
-		tiker, err := NewTicker(format, tp)
-		if err != nil {
-			return Worker{}, err
+/*loadlog : carga los diferentes logs de los distintos workers para tener un proceso limpio*/
+func (p *MasterWorker) loadlog() error {
+	if p.config.Pathlog != "" {
+		fileslog := StArchMa{
+			{
+				Path:   p.config.Pathlog + "/logs",
+				IndDir: true,
+			}, {
+				Path:   p.config.Pathlog + "/logs/error",
+				IndDir: true,
+			}, {
+				Path:   p.config.Pathlog + "/logs/debug",
+				IndDir: true,
+			},
 		}
-		wrol := NewWorkTicker(tiker, job)
-		return wrol, nil
-	case "time":
-		hrtime, err := NewHrTimeStr(format)
+		err := fileslog.Create()
 		if err != nil {
-			return Worker{}, err
+			return err
 		}
-		wrol, err := NewWorkTime(hrtime.hr, hrtime.min, job)
-		if err != nil {
-			return Worker{}, err
+		LogsMap := make(map[string]*StLog)
+		for key := range p.workers {
+			if p.config.Debug {
+				LogsMap[key+"d"] = &StLog{
+					Dir:    p.config.Pathlog + "/logs/debug",
+					Prefix: "DEBUG",
+					Name:   key,
+					Fe:     time.Now(),
+				}
+				err = LogsMap[key+"d"].Init()
+				if err != nil {
+					return err
+				}
+			}
+
+			LogsMap[key+"e"] = &StLog{
+				Dir:    p.config.Pathlog + "/logs/error",
+				Prefix: "ERROR",
+				Name:   key,
+				Fe:     time.Now(),
+			}
+			err = LogsMap[key+"e"].Init()
+			if err != nil {
+				return err
+			}
 		}
-		return wrol, nil
-	default:
-		return Worker{}, fmt.Errorf("error en tipo")
+		p.logs = LogsMap
 	}
+	return nil
 }
 
-/*NewWorkTicker : crea una tarea mediante un ticker para ponerlo en un servicio*/
-func NewWorkTicker(p *time.Ticker, job Job) Worker {
-	return Worker{
-		finalid:   false,
-		job:       job,
-		ticker:    p,
-		start:     false,
-		activo:    true,
-		indticker: true,
+/*loaddir : carga los  directorios y archivos de configuracion del proyecto*/
+func (p *MasterWorker) loaddir() error {
+	if len(p.config.ConfigDir) > 0 {
+		err := p.config.ConfigDir.Create()
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-/*NewWorkTime : crea una tarea mediante una hora exacta para ponerlo en un servicio*/
-func NewWorkTime(hr, min int, job Job) (Worker, error) {
-	hrTime, err := NewHrTime(hr, min)
-	if err != nil {
-		return Worker{}, err
+/*Printf : Ingresa un texto en los logs asignados. */
+func (p *MasterWorker) Printf(err bool, key, format string, args ...interface{}) error {
+	if p.ValidWork(key) {
+		tp := ReturnIf(err, key+"e", key+"d").(string)
+		p.logs[tp].Printf(format, args...)
 	}
-	return Worker{
-		finalid:   false,
-		job:       job,
-		hr:        hrTime,
-		start:     false,
-		activo:    true,
-		indticker: false,
-	}, nil
+	return nil
+}
+
+/*Debug : ingresa un texto en modo debug*/
+func (p *MasterWorker) Debug(key, format string, args ...interface{}) error {
+	return p.Printf(false, key, format, args...)
+}
+
+/*Debug : ingresa un texto en modo error*/
+func (p *MasterWorker) Error(key, format string, args ...interface{}) error {
+	return p.Printf(true, key, format, args...)
 }

@@ -29,8 +29,7 @@ type (
 
 /*ToJSON : Convierte un  StSQLData a utl.JSON*/
 func (p *StSQLData) ToJSON() utl.JSON {
-	var data utl.JSON
-	data = p.Data
+	var data utl.JSON = p.Data
 	return data
 }
 
@@ -46,8 +45,7 @@ func (p *StSQLData) Unmarshal(v interface{}) error {
 
 /*NewStData : crea un Stdata de un map*/
 func NewStData(mp map[string]interface{}) StData {
-	var data StData
-	data = mp
+	var data StData = mp
 	return data
 }
 
@@ -131,57 +129,49 @@ func (p *StData) ToJSON() ([]byte, error) {
 
 /*ToString : Convierte el valor del map interface{} a string.*/
 func (p *StData) ToString(columna string) (string, error) {
-	var valor interface{}
-	valor = (*p)[columna]
+	var valor interface{} = (*p)[columna]
 	return utl.ToString(valor), nil
 }
 
 /*ToInt : Convierte el valor del map interface{} a int.*/
 func (p *StData) ToInt(columna string) (int, error) {
-	var valor interface{}
-	valor = (*p)[columna]
+	var valor interface{} = (*p)[columna]
 	return utl.ToInt(valor), nil
 }
 
 /*ToInt32 : Convierte el valor del map interface{} a int32.*/
 func (p *StData) ToInt32(columna string) int32 {
-	var valor interface{}
-	valor = (*p)[columna]
+	var valor interface{} = (*p)[columna]
 	return utl.ToInt32(valor)
 }
 
 /*ToBool : Convierte el valor del map interface{} a bool.*/
 func (p *StData) ToBool(columna string) bool {
-	var valor interface{}
-	valor = (*p)[columna]
+	var valor interface{} = (*p)[columna]
 	return utl.ToBoolean(valor)
 }
 
 /*ToInt64 : Convierte el valor del map interface{} a int64.*/
 func (p *StData) ToInt64(columna string) (int64, error) {
-	var valor interface{}
-	valor = (*p)[columna]
+	var valor interface{} = (*p)[columna]
 	return utl.ToInt64(valor), nil
 }
 
 /*ToFloat : Convierte el valor del map interface{} a float.*/
 func (p *StData) ToFloat(columna string) (float32, error) {
-	var valor interface{}
-	valor = (*p)[columna]
+	var valor interface{} = (*p)[columna]
 	return utl.ToFloat(valor), nil
 }
 
 /*ToFloat64 : Convierte el valor del map interface{} a float.*/
 func (p *StData) ToFloat64(columna string) (float64, error) {
-	var valor interface{}
-	valor = (*p)[columna]
+	var valor interface{} = (*p)[columna]
 	return utl.ToFloat64(valor), nil
 }
 
 /*ToDate : Convierte el valor del map interface{} a time.*/
 func (p *StData) ToDate(columna string) (time.Time, error) {
-	var valor interface{}
-	valor = (*p)[columna]
+	var valor interface{} = (*p)[columna]
 	vl := utl.ToString(valor)
 	return utl.StringToDate(vl)
 }

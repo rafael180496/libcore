@@ -9,21 +9,12 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-/*envTableData : convierte los datos en tipos  json */
-func envTableData(tableData []map[string]interface{}, datachan chan utl.JSON, errchan chan error) {
-	d, err := utl.NewJSON(tableData)
-	if err != nil {
-		errchan <- err
-	} else {
-		datachan <- d
-	}
-}
-
 /*strURL : Arma la cadena de conexion dependiendo del tipo*/
 func strURL(tipo string, conexion StCadConect) (string, string) {
 	switch tipo {
 	case Ora:
 		/*Open("oracle", "oracle://user:pass@server/service_name")*/
+		//return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
 		return PrefijosDB[tipo], fmt.Sprintf(CADCONN[tipo], conexion.Usuario, conexion.Clave, conexion.Host, conexion.Puerto, conexion.Nombre)
 	case Post:
 		/*"postgres://user:password@localhost:port/bdnamme?sslmode=verify-full"*/
@@ -76,10 +67,10 @@ func sendData(valores []interface{}, columnas []string) StData {
 		if col == nil {
 			continue
 		}
-		switch col.(type) {
+		switch col := col.(type) {
 
 		case []byte:
-			data[columnas[i]] = string(col.([]byte))
+			data[columnas[i]] = string(col)
 		default:
 			data[columnas[i]] = col
 		}
@@ -106,7 +97,7 @@ func scanData(rows *sqlx.Rows, maxRows int, indLimit bool) ([]StData, error) {
 		ptrData[i] = &valores[i]
 	}
 	for rows.Next() {
-		if indLimit == true {
+		if indLimit {
 			if countRows > maxRows {
 				break
 			}
@@ -120,47 +111,6 @@ func scanData(rows *sqlx.Rows, maxRows int, indLimit bool) ([]StData, error) {
 		result = append(result, data)
 	}
 	return result, nil
-}
-
-/*ScanDataGeneric : escanea los datos de ejecutarquerieGO en rutinas */
-func ScanDataGeneric(filas *sqlx.Rows, columnas []string, cantrows int, datachan chan utl.JSON, errchan chan error) {
-	defer filas.Close()
-	tableData := []map[string]interface{}{}
-	values := make([]interface{}, len(columnas))
-	valuePtrs := make([]interface{}, len(columnas))
-	for i := 0; i < len(columnas); i++ {
-		valuePtrs[i] = &values[i]
-	}
-	for filas.Next() {
-		err := filas.Scan(valuePtrs...)
-		if err != nil {
-			errchan <- err
-			break
-		}
-		entrada := make(map[string]interface{})
-		for i, col := range columnas {
-			var v interface{}
-			val := values[i]
-			switch vv := val.(type) {
-			case []byte:
-				v = string(vv)
-			default:
-				v = vv
-			}
-			entrada[col] = v
-		}
-		tableData = append(tableData, entrada)
-		if cantrows > 0 && len(tableData) >= cantrows {
-			envTableData(tableData, datachan, errchan)
-			tableData = []map[string]interface{}{}
-			break
-		}
-	}
-	if filas.Err() != nil {
-		errchan <- filas.Err()
-	}
-	close(datachan)
-	close(errchan)
 }
 
 /*validTp : valida los tipos de conexion disponible*/
@@ -214,6 +164,10 @@ func (p *StConect) queryGeneric(query StQuery, cantrow int, indConect, indLimit 
 		return result, err
 	}
 	sqltemp, args, err = p.NamedIn(query)
+	if err != nil {
+		p.Close()
+		return result, err
+	}
 	filas, err = p.DBGO.Queryx(sqltemp, args...)
 	if err != nil {
 		p.Close()

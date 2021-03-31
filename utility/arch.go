@@ -15,8 +15,8 @@ type (
 	StArchMa []StArch
 	/*StArch : estructura para registra los archivos y generarlos.*/
 	StArch struct {
-		Path   string
-		IndDir bool
+		Path   string `json:"file"`
+		IndDir bool   `json:"indir"`
 	}
 	/*StLog : Estructura para crear log personalizados por medio de la fecha
 	directorio/fecha.log
