@@ -43,6 +43,8 @@ func NewTicker(ft, tp string) (*time.Ticker, error) {
 	}.Do()
 	return timeTicker, err
 }
+
+/*NewHrTimeStr : crea un time con formato de hora 24hr ejemplo 24:00*/
 func NewHrTimeStr(fr string) (HrTime, error) {
 	var (
 		err    error

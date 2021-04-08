@@ -42,15 +42,15 @@ func (p *MasterWorker) SendWork(key string) (*Worker, error) {
 
 /*Loadmaster : carga todas las configuraciones del master workers*/
 func (p *MasterWorker) Loadmaster() error {
-	err := p.loaddir()
+	err := p.loadworks()
+	if err != nil {
+		return err
+	}
+	err = p.loaddir()
 	if err != nil {
 		return err
 	}
 	err = p.loadlog()
-	if err != nil {
-		return err
-	}
-	err = p.loadworks()
 	if err != nil {
 		return err
 	}
@@ -118,6 +118,37 @@ func (p *MasterWorker) ReloadWork(key string) error {
 func (p *MasterWorker) Finally(key string) {
 	if p.ValidWork(key) {
 		p.workers[key].Finally()
+	}
+}
+
+/*FinallyDet : Finalizacion del proceso donde el indicativo reset es para reintentar secuencia ademas guarda en los logs si termino bien o tuvo un error ademas tiene la opcion de
+reconfigurar el proceso para la proxima ejecucion*/
+func (p *MasterWorker) FinallyDet(key, msg string, indreload, inderr bool) error {
+	if p.ValidWork(key) {
+		p.workers[key].Finally()
+		if inderr {
+			PrintGreen(msg)
+			p.Error(key, msg)
+		} else {
+			PrintGreen(msg)
+			p.Debug(key, msg)
+		}
+		if indreload && !inderr {
+			return p.ReloadWork(key)
+		}
+		return nil
+	}
+	return nil
+}
+
+/*StartGen : ejecuta una tarea en paralelo en forma general con un log de inicio de proceso*/
+func (p *MasterWorker) StartDet(key, msg string) {
+	if p.ValidWork(key) {
+		p.workers[key].StartGen()
+		if p.workers[key].GetStart() {
+			p.Debug(key, msg)
+			PrintGreen(msg)
+		}
 	}
 }
 

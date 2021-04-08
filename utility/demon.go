@@ -28,6 +28,11 @@ func (p *Worker) Finally() {
 	p.start = false
 }
 
+/*GetStart : Envia si el proceso esta en ejecucion*/
+func (p *Worker) GetStart() bool {
+	return p.start
+}
+
 /*SetActivo : modifica para que se desactive la tarea*/
 func (p *Worker) SetActivo(act bool) {
 	p.activo = act
