@@ -125,15 +125,15 @@ func (p *MasterWorker) Finally(key string) {
 /*FinallyDet : Finalizacion del proceso donde el indicativo reset es para reintentar secuencia ademas guarda en los logs si termino bien o tuvo un error ademas tiene la opcion de
 reconfigurar el proceso para la proxima ejecucion*/
 func (p *MasterWorker) FinallyDet(key, msg string, indreload, inderr bool) error {
-	msg = msg + "\n"
 	if p.ValidWork(key) {
+		format := fmt.Sprintf("[%s] %s\n", ToDateStr(time.Now()), msg)
 		p.workers[key].Finally()
 		p.print[key] = false
 		if inderr {
-			PrintRed(msg)
+			PrintRed(format)
 			p.Error(key, msg)
 		} else {
-			PrintGreen(msg)
+			PrintGreen(format)
 			p.Debug(key, msg)
 		}
 		if indreload && !inderr {
@@ -147,11 +147,12 @@ func (p *MasterWorker) FinallyDet(key, msg string, indreload, inderr bool) error
 /*StartGen : ejecuta una tarea en paralelo en forma general con un log de inicio de proceso*/
 func (p *MasterWorker) StartDet(key, msg string) {
 	if p.ValidWork(key) {
+		format := fmt.Sprintf("[%s] %s\n", ToDateStr(time.Now()), msg)
 		p.workers[key].StartGen()
 		if p.workers[key].GetStart() && !p.print[key] {
 			p.print[key] = true
 			p.Debug(key, msg)
-			PrintGreen(msg + "\n")
+			PrintGreen(format)
 		}
 	}
 }
