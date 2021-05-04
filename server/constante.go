@@ -115,7 +115,7 @@ var (
 	DefaultClient     = &Client{HTTPClient: &http.Client{}}
 	ie11Regexp        = regexp.MustCompile("^rv:(.+)$")
 	botRegex          = regexp.MustCompile("(?i)(bot|crawler|sp(i|y)der|search|worm|fetch|nutch)")
-	botFromSiteRegexp = regexp.MustCompile("http[s]?://.+\\.\\w+")
+	botFromSiteRegexp = regexp.MustCompile(`http[s]?://.+\.\w+`)
 	sectionBrow       = map[string]string{
 		"CriOS":    "Chrome",
 		"Chrome":   "Chrome",

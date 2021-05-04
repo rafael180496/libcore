@@ -1,6 +1,9 @@
 package server
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 func getPlatform(comment []string) string {
 	if len(comment) > 0 {
@@ -64,6 +67,7 @@ func parseSection(ua string, index *int) (s section) {
 		buffer = readUntil(ua, index, ']', true)
 		*index++
 	}
+	fmt.Println(buffer)
 	return s
 }
 func gecko(p *UserAgent, comment []string) {
@@ -224,12 +228,10 @@ func normalizeOS(name string) string {
 	return name
 }
 func (p *UserAgent) iMessagePreview() bool {
-	if strings.Index(p.UA, "facebookexternalhit") == -1 {
+	if !strings.Contains(p.UA, "facebookexternalhit") || !strings.Contains(p.UA, "Twitterbot") {
 		return false
 	}
-	if strings.Index(p.UA, "Twitterbot") == -1 {
-		return false
-	}
+
 	p.Bot = true
 	p.Browser.Name = "iMessage-Preview"
 	p.Browser.Engine = ""
@@ -238,7 +240,7 @@ func (p *UserAgent) iMessagePreview() bool {
 }
 
 func (p *UserAgent) googleOrBingBot() bool {
-	if strings.Index(p.UA, "Google") != -1 || strings.Index(p.UA, "bingbot") != -1 {
+	if !strings.Contains(p.UA, "Google") || !strings.Contains(p.UA, "bingbot") {
 		p.Platform = ""
 		p.Undecided = true
 	}

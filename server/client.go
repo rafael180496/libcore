@@ -9,12 +9,24 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	utl "github.com/rafael180496/libcore/utility"
 )
 
 /*BasicAuth : autentificacion basica de un client http */
 func BasicAuth(username, password string) string {
 	auth := fmt.Sprintf("%s:%s", username, password)
 	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+}
+
+/*TokenHeaders : autentificacion por medio de token bearer*/
+func TokenHeaders(token string) map[string]string {
+	Headers := make(map[string]string)
+	Headers["Content-Type"] = "application/json"
+	if utl.IsNilStr(token) {
+		Headers["Authorization"] = fmt.Sprintf("Bearer %s", token)
+	}
+	return Headers
 }
 
 /*NewNetClient : crea una instancia de http client*/
@@ -30,6 +42,15 @@ func NewNetClient(timeout int) *http.Client {
 		Transport: netTransport,
 	}
 	return netClient
+}
+
+/*SendRequest : envia una peticion de una api rest*/
+func (c *Client) SendByte(req Request) ([]byte, int, error) {
+	resp, err := c.Send(req)
+	if err != nil {
+		return nil, 0, err
+	}
+	return utl.StrtoByte(resp.Body), resp.StatusCode, nil
 }
 
 /*AddQueryParameters : agrega los parametros para un param querie*/
