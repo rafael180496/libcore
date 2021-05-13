@@ -155,6 +155,12 @@ func ToDateStr(t time.Time) string {
 		t.Hour(), t.Minute(), t.Second())
 }
 
+/*ToDateStrSingle : envia en formato largo un datetime YYYY-MM-DD*/
+func ToDateStrSingle(t time.Time) string {
+	return fmt.Sprintf("%d-%02d-%02d",
+		t.Year(), t.Month(), t.Day())
+}
+
 /*StringToDate : convierte un string a un time */
 func StringToDate(s string) (time.Time, error) {
 	return parsedate(s, []string{
