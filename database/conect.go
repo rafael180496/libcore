@@ -14,7 +14,7 @@ import (
 	/*Conexion a postgrest*/
 	_ "github.com/lib/pq"
 	/*Conexion a oracle*/
-	_ "gopkg.in/rana/ora.v4"
+	_ "github.com/sijms/go-ora/v2"
 	/*Conexion a sql server*/
 	_ "github.com/denisenkom/go-mssqldb"
 	/*Conexion a sqllite*/
