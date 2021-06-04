@@ -111,8 +111,25 @@ func (p *StConect) NamedIn(query StQuery) (string, []interface{}, error) {
 		return "", nil, err
 	}
 	sqltemp = p.DBGO.Rebind(sqltemp)
-
+	if p.Conexion.Tipo == Ora {
+		sqltemp = SqlRebindSTR(sqltemp)
+	}
 	return sqltemp, args, err
+}
+
+/*SqlRebindSTR : repara el sql para el driver sql en tipos oracle*/
+func SqlRebindSTR(sql string) string {
+	sec := 1
+	sqltemp := ""
+	for _, v := range sql {
+		if v == '?' {
+			sqltemp += fmt.Sprintf(":%d", sec)
+			sec++
+		} else {
+			sqltemp += string(v)
+		}
+	}
+	return sqltemp
 }
 
 /*Trim : Elimina los espacio en cualquier campo string */
