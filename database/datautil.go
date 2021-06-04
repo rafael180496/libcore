@@ -207,12 +207,28 @@ func (p *StConect) execAux(Data []StQuery, tipACC string, indvalid, indConect bo
 				return err
 			}
 		}
-		_, err = tx.NamedExec(dat.Querie, dat.Args)
-		if err != nil {
-			p.Close()
-			tx.Rollback()
-			return err
+		if p.Conexion.Tipo == Ora {
+			sqltemp, args, err := p.NamedIn(dat)
+			if err != nil {
+				p.Close()
+				tx.Rollback()
+				return err
+			}
+			_, err = tx.Exec(sqltemp, args...)
+			if err != nil {
+				p.Close()
+				tx.Rollback()
+				return err
+			}
+		} else {
+			_, err = tx.NamedExec(dat.Querie, dat.Args)
+			if err != nil {
+				p.Close()
+				tx.Rollback()
+				return err
+			}
 		}
+
 	}
 	err = tx.Commit()
 	if err != nil {
