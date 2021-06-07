@@ -14,7 +14,7 @@ import (
 	/*Conexion a postgrest*/
 	_ "github.com/lib/pq"
 	/*Conexion a oracle*/
-	_ "github.com/sijms/go-ora/v2"
+	_ "gopkg.in/rana/ora.v4"
 	/*Conexion a sql server*/
 	_ "github.com/denisenkom/go-mssqldb"
 	/*Conexion a sqllite*/
@@ -111,25 +111,8 @@ func (p *StConect) NamedIn(query StQuery) (string, []interface{}, error) {
 		return "", nil, err
 	}
 	sqltemp = p.DBGO.Rebind(sqltemp)
-	if p.Conexion.Tipo == Ora {
-		sqltemp = SqlRebindSTR(sqltemp)
-	}
-	return sqltemp, args, err
-}
 
-/*SqlRebindSTR : repara el sql para el driver sql en tipos oracle*/
-func SqlRebindSTR(sql string) string {
-	sec := 1
-	sqltemp := ""
-	for _, v := range sql {
-		if v == '?' {
-			sqltemp += fmt.Sprintf(":%d", sec)
-			sec++
-		} else {
-			sqltemp += string(v)
-		}
-	}
-	return sqltemp
+	return sqltemp, args, err
 }
 
 /*Trim : Elimina los espacio en cualquier campo string */
