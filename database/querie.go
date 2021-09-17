@@ -12,7 +12,7 @@ import (
 /*QueryNative :  ejecuta la funcion nativa del paquete sql*/
 func (p *StConect) QueryNative(sql string, indConect bool, args ...interface{}) (*sql.Rows, error) {
 	if !utl.IsNilStr(sql) {
-		return nil, utl.StrErr("El querie esta vacio")
+		return nil, utl.StrErr("el Query esta vacio")
 	}
 	err := p.Con()
 	if err != nil {
