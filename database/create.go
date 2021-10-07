@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	utl "github.com/rafael180496/libcore/utility"
+	utl "github.com/rafael180496/core-util/utility"
 	"gopkg.in/ini.v1"
 )
 

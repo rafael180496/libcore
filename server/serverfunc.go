@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	utl "github.com/rafael180496/libcore/utility"
+	utl "github.com/rafael180496/core-util/utility"
 	"gopkg.in/ini.v1"
 
 	echo "github.com/labstack/echo/v4"

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	utl "github.com/rafael180496/libcore/utility"
+	utl "github.com/rafael180496/core-util/utility"
 )
 
 type (

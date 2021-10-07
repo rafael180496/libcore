@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	utl "github.com/rafael180496/libcore/utility"
+	utl "github.com/rafael180496/core-util/utility"
 	"gopkg.in/ini.v1"
 )
 

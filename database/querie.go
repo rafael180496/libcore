@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	utl "github.com/rafael180496/libcore/utility"
+	utl "github.com/rafael180496/core-util/utility"
 )
 
 /*QueryNative :  ejecuta la funcion nativa del paquete sql*/
