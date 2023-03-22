@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/jmoiron/sqlx"
-	utl "github.com/rafael180496/core-util/utility"
+	utl "github.com/rafael180496/libcore/utility"
 
 	/*Conexion a mysql*/
 	_ "github.com/go-sql-driver/mysql"
@@ -135,7 +135,8 @@ func (p *StConect) ConfigURL(url string) {
 	p.urlNative = url
 }
 
-/*ConfigJSON : Lee las configuraciones de conexion mediante un .json
+/*
+ConfigJSON : Lee las configuraciones de conexion mediante un .json
 
 Ejemplo:
 
@@ -151,7 +152,6 @@ Ejemplo:
 	"filedb":""
 
 }
-
 */
 func (p *StConect) ConfigJSON(PathJSON string) error {
 	var (
@@ -200,7 +200,8 @@ func (p *StConect) ConfigDBX(path, pass string) error {
 	return nil
 }
 
-/*ConfigINI : Lee las configuraciones de conexion mediante un .ini
+/*
+ConfigINI : Lee las configuraciones de conexion mediante un .ini
 
 Ejemplo:
 
@@ -221,7 +222,6 @@ host = Localhost
 sslmode = opcional
 
 filedb = opcional sqllite
-
 */
 func (p *StConect) ConfigINI(PathINI string) error {
 	if !utl.FileExt(PathINI, "INI") {
@@ -235,7 +235,8 @@ func (p *StConect) ConfigINI(PathINI string) error {
 	return nil
 }
 
-/*ConfigENV : lee las configuracion de la base de datos mediante variables de entorno
+/*
+ConfigENV : lee las configuracion de la base de datos mediante variables de entorno
 Ejemplo:
 ENV USUARIO = prueba
 ENV CLAVE = prueba
