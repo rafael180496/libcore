@@ -53,6 +53,37 @@ func (c *Client) SendByte(req Request) ([]byte, int, error) {
 	return utl.StrtoByte(resp.Body), resp.StatusCode, nil
 }
 
+/*
+SendRequest : envia una peticion de una api rest con headers response
+return:
+body
+headers
+code
+error
+*/
+func (c *Client) SendByteV2(req Request) ([]byte, map[string][]string, int, error) {
+	resp, err := c.Send(req)
+	if err != nil {
+		return nil, nil, 0, err
+	}
+	return utl.StrtoByte(resp.Body), resp.Headers, resp.StatusCode, nil
+}
+
+/*
+SendNative : envia una peticion de una api rest con headers response
+return:
+*Response
+code
+error
+*/
+func (c *Client) SendNative(req Request) (*Response, int, error) {
+	resp, err := c.Send(req)
+	if err != nil {
+		return nil, 0, err
+	}
+	return resp, resp.StatusCode, nil
+}
+
 /*AddQueryParameters : agrega los parametros para un param querie*/
 func AddQueryParameters(baseURL string, queryParams map[string]string) string {
 	baseURL += "?"
