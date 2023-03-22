@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	utl "github.com/rafael180496/core-util/utility"
+	utl "github.com/rafael180496/libcore/utility"
 )
 
 type (
@@ -68,7 +68,8 @@ func (p *StData) ValidColum(col string) bool {
 	return ok
 }
 
-/*FindTp : busca el tipo de datos para las tablas con constante prederminadas
+/*
+FindTp : busca el tipo de datos para las tablas con constante prederminadas
 INTP : tipo core entero
 STTP : tipo core texto
 FLTP : tipo core numerico

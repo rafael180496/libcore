@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"time"
 
-	utl "github.com/rafael180496/core-util/utility"
+	utl "github.com/rafael180496/libcore/utility"
 )
 
 /*BasicAuth : autentificacion basica de un client http */

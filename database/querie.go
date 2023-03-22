@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	utl "github.com/rafael180496/core-util/utility"
+	utl "github.com/rafael180496/libcore/utility"
 )
 
 /*QueryNative :  ejecuta la funcion nativa del paquete sql*/
@@ -43,12 +43,14 @@ func (p *StConect) QueryOne(query StQuery, indConect bool) (StData, error) {
 	return result[0], nil
 }
 
-/*Query : Ejecuta un querie en la base de datos y
-  devuelve un map dinamico para mostrar los datos donde le limitan la cantida
-	de registro que debe de devolver
-	indConect = true deja la conexion abierta
-  Ejemplo:
-  map[COD_CLI:50364481 NIS_RAD:5355046 SEC_NIS:1]
+/*
+Query : Ejecuta un querie en la base de datos y
+
+	  devuelve un map dinamico para mostrar los datos donde le limitan la cantida
+		de registro que debe de devolver
+		indConect = true deja la conexion abierta
+	  Ejemplo:
+	  map[COD_CLI:50364481 NIS_RAD:5355046 SEC_NIS:1]
 */
 func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, error) {
 	if cantrow <= 0 {
@@ -57,11 +59,13 @@ func (p *StConect) Query(query StQuery, cantrow int, indConect bool) ([]StData, 
 	return p.queryGeneric(query, cantrow, indConect, true)
 }
 
-/*QueryMap : Ejecuta un querie en la base de datos y
-  devuelve un map dinamico para mostrar los datos donde le limitan la cantida
-	de registro que debe de devolver
-	indConect = true deja la conexion abierta
-	indLimit = true limite de fila si esta en false desactiva esta opcion
+/*
+QueryMap : Ejecuta un querie en la base de datos y
+
+	  devuelve un map dinamico para mostrar los datos donde le limitan la cantida
+		de registro que debe de devolver
+		indConect = true deja la conexion abierta
+		indLimit = true limite de fila si esta en false desactiva esta opcion
 */
 func (p *StConect) QueryMap(query StQuery, cantrow int, indConect, indLimit bool) ([]StData, error) {
 	result, err := p.queryGeneric(query, cantrow, indConect, indLimit)
@@ -71,11 +75,13 @@ func (p *StConect) QueryMap(query StQuery, cantrow int, indConect, indLimit bool
 	return result, nil
 }
 
-/*QueryJSON : Ejecuta un querie en la base de datos y
-  devuelve un json dinamico para mostrar los datos donde le limitan la cantida
-	de registro que debe de devolver
-	indConect = true deja la conexion abierta
-	indLimit = true limite de fila si esta en false desactiva esta opcion
+/*
+QueryJSON : Ejecuta un querie en la base de datos y
+
+	  devuelve un json dinamico para mostrar los datos donde le limitan la cantida
+		de registro que debe de devolver
+		indConect = true deja la conexion abierta
+		indLimit = true limite de fila si esta en false desactiva esta opcion
 */
 func (p *StConect) QueryJSON(query StQuery, cantrow int, indConect, indLimit bool) ([]byte, error) {
 	result, err := p.queryGeneric(query, cantrow, indConect, indLimit)
@@ -89,10 +95,12 @@ func (p *StConect) QueryJSON(query StQuery, cantrow int, indConect, indLimit boo
 	return JSON, nil
 }
 
-/*QueryStruct : Ejecuta un query en la base de datos y
-  captura la data con struct
-	EjecutarQueryStruct(&data,sql,true)
-	indConect = true deja la conexion abierta
+/*
+QueryStruct : Ejecuta un query en la base de datos y
+
+	  captura la data con struct
+		EjecutarQueryStruct(&data,sql,true)
+		indConect = true deja la conexion abierta
 */
 func (p *StConect) QueryStruct(datadest interface{}, query StQuery, indConect bool) error {
 	var (
@@ -119,9 +127,11 @@ func (p *StConect) QueryStruct(datadest interface{}, query StQuery, indConect bo
 	return nil
 }
 
-/*QueryRows : Ejecuta un query en la base de datos y
-  devuelve un puntero de *Rows de sqlx
-	indConect = true deja la conexion abierta
+/*
+QueryRows : Ejecuta un query en la base de datos y
+
+	  devuelve un puntero de *Rows de sqlx
+		indConect = true deja la conexion abierta
 */
 func (p *StConect) QueryRows(query StQuery, indConect bool) (*sqlx.Rows, error) {
 	var (
